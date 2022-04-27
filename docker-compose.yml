@@ -36,7 +36,7 @@ services:
       - ./fastapi-app/requirements.txt:/code/requirements.txt
       - fastapi_packages:/usr/local/lib/python3.10/site-packages
   install: # service for install additional web service's dependencies
-    image: test-docker-nextjs_web # image web services (*project dir.*_web)
+    image: pe-dx_web # image web services (*project dir.*_web)
     container_name: install
     depends_on:
       - web
@@ -46,7 +46,7 @@ services:
     working_dir: /usr/app
     command: sh -c "yarn && touch index.js"
   install_fastapi: # service for install additional fastapi's packages
-    image: test-docker-nextjs_fastapi # image fastapi
+    image: pe-dx_fastapi # image fastapi
     container_name: fastapi_install
     depends_on:
       - fastapi

@@ -21,7 +21,7 @@ const Qrscanner: FC<QrScannerType> = (props) => {
           setCameraId(devices[0].id);
         }
       })
-      .catch((err) => console.warn(err));
+      .catch((err) => alert(err));
   }
 
   function startCamera() {
@@ -60,45 +60,50 @@ const Qrscanner: FC<QrScannerType> = (props) => {
   };
 
   return (
-    <div id="camera">
-      <p>Pro mode camera</p>
-      {cameras.length == 0 ? (
-        <button className="button is-primary" onClick={triggerCamera}>
-          Get camera
+    <>
+      <div id="camera">
+        <p>Pro mode camera</p>
+        {cameras.length == 0 ? (
+          <button className="button is-primary" onClick={triggerCamera}>
+            Get camera
+          </button>
+        ) : (
+          <>
+            <div className="select">
+              <select
+                id="camera-selector"
+                onChange={(e) => setCameraId(e.currentTarget.value)}
+                value={cameraId}
+              >
+                {cameras.map((cam, idx) => {
+                  return (
+                    <option key={idx} value={cam.id}>
+                      {cam.label}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            {cameraActivated ? (
+              <button
+                className="button is-warning"
+                onClick={() => stopCamera()}
+              >
+                stop scanning
+              </button>
+            ) : (
+              <button className="button is-link" onClick={() => startCamera()}>
+                start scanning
+              </button>
+            )}
+          </>
+        )}
+        <button className="button" onClick={() => console.log(cameraScan)}>
+          get selected camera
         </button>
-      ) : (
-        <>
-          <div className="select">
-            <select
-              id="camera-selector"
-              onChange={(e) => setCameraId(e.currentTarget.value)}
-              value={cameraId}
-            >
-              {cameras.map((cam, idx) => {
-                return (
-                  <option key={idx} value={cam.id}>
-                    {cam.label}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          {cameraActivated ? (
-            <button className="button is-warning" onClick={() => stopCamera()}>
-              stop scanning
-            </button>
-          ) : (
-            <button className="button is-link" onClick={() => startCamera()}>
-              start scanning
-            </button>
-          )}
-        </>
-      )}
-      <button className="button" onClick={() => console.log(cameraScan)}>
-        get selected camera
-      </button>
+      </div>
       <div id="camera-scanner" style={{ width: "600px" }}></div>
-    </div>
+    </>
   );
 };
 

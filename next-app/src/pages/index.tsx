@@ -3,7 +3,6 @@ import type { NextPage, GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "../styles/Home.module.css";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -27,7 +26,6 @@ const LanguageSelector = () => {
 
 const Home: NextPage = () => {
   const { t } = useTranslation();
-  const router = useRouter();
 
   function getData() {
     console.log("get data");
