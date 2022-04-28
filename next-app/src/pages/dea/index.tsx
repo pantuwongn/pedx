@@ -14,7 +14,7 @@ const Cam = () => {
   }, []);
 
   return (
-    <div className="cam-test">
+    <div className="center-main dea">
       <Qrscanner setResult={setQrResult} />
       <p>{qrResult}</p>
       <DatePicker

@@ -1,4 +1,5 @@
-@import "camera";
+@import 'bulma/css/bulma.css';
+@import "dea";
 
 html,
 body {
@@ -9,13 +10,18 @@ body {
   overflow: hidden;
 }
 
+.app-main {
+  min-height: 100vh;
+  background-color: mintcream;
+}
+
 .main-page {
-  height: 100vh;
+  height: 100%;
   overflow-x: hidden;
 }
 
-.main {
-  min-height: calc(100vh - 90px);
+.main-content {
+  // min-height: calc(100vh - 90px);
   margin: auto 0;
   padding: 4rem 0;
   flex: 1;
@@ -23,24 +29,36 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  * {
-    animation: fadeInUp;
-    animation-duration: 0.8s;
-  }
   h1 {
-    font-size: 3rem;
+    font-size: 4rem;
     animation: fadeInDown;
     animation-duration: 0.8s;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
   .link-group {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
-    gap: 1rem;
+    font-size: 2rem;
+    gap: 2rem;
+    animation: fadeInUp;
+    animation-duration: 0.8s;
+    > p {
+      margin: 0;
+      cursor: pointer;
+      &:hover {
+        animation: pulse;
+        animation-duration: 0.5s;
+      }
+    }
   }
+}
+
+.nav-bar {
+  padding: 0.5rem;
+  // animation: fadeInDown;
+  // animation-duration: 0.8s;
 }
 
 .footer {
@@ -54,10 +72,20 @@ body {
   align-items: center;
   bottom: 0;
   font-size: 1.2rem;
+  background-color: inherit !important;
 }
 
 .language-selector {
   font-size: 1.2rem;
-  animation: fadeInDown;
-  animation-duration: 0.8s;
+}
+
+.center-main {
+  min-height: 100vh;
+  width: fit-content;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

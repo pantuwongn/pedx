@@ -98,9 +98,6 @@ const Qrscanner: FC<QrScannerType> = (props) => {
             )}
           </>
         )}
-        <button className="button" onClick={() => console.log(cameraScan)}>
-          get selected camera
-        </button>
       </div>
       <div id="camera-scanner" style={{ width: "600px" }}></div>
     </>
