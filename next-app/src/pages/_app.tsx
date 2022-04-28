@@ -3,7 +3,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import type { AppProps } from "next/app";
 import { appWithTranslation } from "next-i18next";
 import Layout from "@/components/layout/layout";
-import "@/styles/main.scss";
+import "@/styles/app.scss";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

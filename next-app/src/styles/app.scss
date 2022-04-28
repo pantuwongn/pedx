@@ -1,0 +1,28 @@
+@import "bulma/css/bulma.css";
+
+// Abstracts
+// @import "abstracts/";
+
+
+// Base
+@import "base/base";
+@import "base/common";
+
+
+// Components
+// @import "components/";
+
+
+// Layout
+@import "layout/footer";
+@import "layout/main";
+@import "layout/navbar";
+
+
+// Pages
+@import "pages/dea";
+@import "pages/home";
+
+
+// Sections
+// @import "sections/*";

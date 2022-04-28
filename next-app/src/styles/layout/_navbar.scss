@@ -1,0 +1,21 @@
+.nav-bar {
+  padding: 0.5rem;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #eaeaea;
+  background-color: inherit;
+  .logo-link {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: black;
+    b {
+      height: fit-content;
+      margin-left: 0.3rem;
+    }
+  }
+}
+
+.language-selector {
+  font-size: 1.2rem;
+}

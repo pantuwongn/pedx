@@ -1,12 +1,7 @@
-import React, { AnchorHTMLAttributes } from "react";
+import React, { FC } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
-
-interface PropsLinkForwardRef {
-  onClick: React.MouseEventHandler;
-  href: string | undefined;
-}
 
 const LanguageSelector = () => {
   const router = useRouter();
@@ -25,16 +20,16 @@ const LanguageSelector = () => {
   );
 };
 
-const LogoLink = React.forwardRef(
-  ({ onClick, href }: PropsLinkForwardRef, ref: any) => {
-    return (
-      <a href={href} onClick={onClick} ref={ref}>
-        <Image src="/pe-dx-logo.svg" width={40} height={40}></Image>
+const LogoLink = React.forwardRef(({ onClick, href }, ref) => {
+  return (
+    <a href={href} onClick={onClick} ref={ref}>
+      <div className="logo-link">
+        <Image src="/pe-dx-logo.svg" width={40} height={40} />
         <b>PE BPK APPS</b>
-      </a>
-    );
-  }
-);
+      </div>
+    </a>
+  );
+});
 
 const Navbar = () => {
   return (
@@ -42,7 +37,10 @@ const Navbar = () => {
       <div className="level-left">
         <div className="level-item">
           <Link href="/home" passHref>
+            {/* <>
+            <Image src="/pe-dx-logo.svg" width={40} height={40} /> */}
             <LogoLink />
+            {/* abc</> */}
           </Link>
         </div>
       </div>
