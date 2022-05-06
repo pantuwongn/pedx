@@ -9,6 +9,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 const LinkGroup = () => {
   return (
     <div className="link-group">
+      <Link href={"/qar"}>
+        <p>
+          <b>Q</b>uality <b>A</b>uto <b>R</b>ecord
+        </p>
+      </Link>
       <Link href={"/5m1e"}>
         <p>
           <b>5M1E</b> Report

@@ -2,7 +2,7 @@ import React from "react";
 
 const _5M1E = () => {
   return (
-    <div className="5m1e">
+    <div className="_5m1e center-main">
       <button className="button is-primary">button</button>
     </div>
   );

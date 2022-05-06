@@ -1,7 +1,16 @@
-from .database import sessionlocal
+from .database import ms_session, pg_async_session
 
-def get_db():
-    db = sessionlocal()
+
+def get_ms_db():
+    db = ms_session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def get_pg_async_db():
+    db = pg_async_session()
     try:
         yield db
     finally:
