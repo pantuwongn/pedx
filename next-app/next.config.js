@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const path = require("path");
 const { i18n } = require("./next-i18next.config");
+const withAntdLess = require("next-plugin-antd-less")
 
-const nextConfig = {
+const nextConfig = withAntdLess({
   // reactStrictMode: true,
   async redirects() {
     return [
@@ -24,6 +25,7 @@ const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
-};
+  lessVarsFilePath: "./src/styles/antd_variables.less"
+});
 
 module.exports = nextConfig;

@@ -1,10 +1,9 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime, Sequence
+from sqlalchemy import Column, String, Integer
 from sqlalchemy.dialects import postgresql
 
-from ..database import Base
+from app.database import Base
 
-
-class Operation_record(Base):
+class Listener_list(Base):
     __tablename__ = "listener_list"
 
     id = Column(Integer, primary_key=True, index=True)

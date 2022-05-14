@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from "react";
-import Qrscanner from "@/components/common/qrscanner";
+import Qrscanner from "@/components/camera/qrscanner";
 import PDFObject from "pdfobject";
 import { PDFDocument } from "pdf-lib";
-import DatePicker from "react-datepicker";
+import { DatePicker } from "antd";
+import moment, { Moment } from "moment";
 
 const Cam = () => {
+  const dateFormat = "DD/MM/YYYY";
   const [qrResult, setQrResult] = useState<string>("");
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [startDate, setStartDate] = useState<Moment | null>(moment());
 
   useEffect(() => {
-    console.log(PDFObject.pdfobjectversion);
-    console.log(PDFDocument.name);
-  }, []);
+    console.log(startDate?.format(dateFormat));
+  }, [startDate]);
 
   return (
-    <div className="center-main dea">
+    <div className="dea center-main">
       <Qrscanner setResult={setQrResult} />
       <p>{qrResult}</p>
       <DatePicker
-        selected={startDate}
-        onChange={(date) => setStartDate(date)}
+        defaultValue={moment()}
+        onChange={(date: Moment | null) => setStartDate(moment(date))}
+        format={dateFormat}
       />
     </div>
   );

@@ -9,9 +9,9 @@ def get_ms_db():
         db.close()
 
 
-def get_pg_async_db():
+async def get_pg_async_db():
     db = pg_async_session()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()

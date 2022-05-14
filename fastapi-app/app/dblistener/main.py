@@ -17,7 +17,7 @@ router = APIRouter(prefix="/dblistener")
 async def get_listen_channel(
     db: AsyncSession = Depends(get_pg_async_db), username: str = ""
 ):
-    return await crud.get_all_record(db, username)
+    return await crud.get_listen_channel(db, username)
 
 
 class TestListen:

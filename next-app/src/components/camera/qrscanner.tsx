@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useRef } from "react";
+import { Button } from "antd";
 
 interface QrScannerType {
   setResult: React.Dispatch<React.SetStateAction<string>>;
@@ -61,12 +62,12 @@ const Qrscanner: FC<QrScannerType> = (props) => {
 
   return (
     <>
-      <div id="camera">
+      <div id="qr-scanner">
         <p>Pro mode camera</p>
         {cameras.length == 0 ? (
-          <button className="button is-primary" onClick={triggerCamera}>
+          <Button type="primary" onClick={triggerCamera}>
             Get camera
-          </button>
+          </Button>
         ) : (
           <>
             <div className="select">
@@ -85,16 +86,13 @@ const Qrscanner: FC<QrScannerType> = (props) => {
               </select>
             </div>
             {cameraActivated ? (
-              <button
-                className="button is-warning"
-                onClick={() => stopCamera()}
-              >
+              <Button type="primary" onClick={() => stopCamera()}>
                 stop scanning
-              </button>
+              </Button>
             ) : (
-              <button className="button is-link" onClick={() => startCamera()}>
+              <Button type="primary" onClick={() => startCamera()}>
                 start scanning
-              </button>
+              </Button>
             )}
           </>
         )}

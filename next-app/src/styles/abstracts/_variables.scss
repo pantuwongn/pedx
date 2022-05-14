@@ -1,0 +1,11 @@
+$bg-color: #fafff0;
+body {
+  &.dark {
+    --bg-color: #383838;
+    --font-color : white;
+  }
+  & {
+    --bg-color: #fafff0;
+    --font-color: #383838;
+  }
+}

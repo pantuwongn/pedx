@@ -1,21 +1,41 @@
 .nav-bar {
+  display: flex;
   padding: 0.5rem;
   position: sticky;
   top: 0;
-  border-bottom: 1px solid #eaeaea;
-  background-color: inherit;
+  height: 60px;
+  align-items: center;
+  background-color: var(--bg-color);
+  z-index: 999;
+  // &__left {
+  // }
+  &__right {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    .theme-switcher {
+      margin-right: 0.5rem;
+    }
+    .language-selector {
+      font-size: 1.2rem;
+      font-weight: bold;
+      width: fit-content;
+    }
+  }
   .logo-link {
     display: flex;
     align-items: center;
     font-size: 1.2rem;
-    color: black;
+    width: fit-content;
     b {
       height: fit-content;
       margin-left: 0.3rem;
     }
+    &__wrapper {
+      width: fit-content;
+      abbr {
+        cursor: pointer;
+      }
+    }
   }
-}
-
-.language-selector {
-  font-size: 1.2rem;
 }

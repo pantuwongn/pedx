@@ -1,3 +1,8 @@
 .main-content {
-  flex: 1;
+  // display: flex;
+  // flex: 1;
+  height: fit-content;
+  overflow-y: auto; // test
+  border-top: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
 }

@@ -1,0 +1,12 @@
+Generic single-database configuration with an async dbapi.
+
+```
+# make migrations
+alembic revision --autogenerate "revision-name"
+# upgrade to latest migration
+alembic upgrade head
+# show revisions list
+# alembic show
+```
+
+(Alembic Sqlalchemy documentation)[https://alembic.sqlalchemy.org/en/latest/tutorial.html]

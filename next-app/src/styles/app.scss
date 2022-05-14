@@ -1,7 +1,6 @@
-@import "bulma/css/bulma.css";
-
 // Abstracts
-// @import "abstracts/";
+@import "abstracts/theme";
+@import "abstracts/common";
 
 
 // Base
@@ -10,7 +9,8 @@
 
 
 // Components
-// @import "components/";
+@import "components/camera";
+@import "components/qrscanner";
 
 
 // Layout
