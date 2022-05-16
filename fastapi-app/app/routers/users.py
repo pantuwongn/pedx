@@ -6,7 +6,7 @@ from app.users import schemas
 from app.users.classes import UserManager
 from app.dependencies import get_pg_async_db, get_db
 from app.errors import ErrorCode
-from app.auth.bearer import write_token, read_token
+from app.auth.bearer import BearerResponse,BearerDependency, write_token, read_token
 
 
 # TODO create router folder to centralize all router separate by module file name
@@ -16,6 +16,10 @@ from app.auth.bearer import write_token, read_token
 def users_routers(db: AsyncGenerator) -> APIRouter:
     router = APIRouter()
     user_manager = UserManager()
+
+    @router.get("/me",dependencies=[Depends(BearerDependency())])
+    async def get_current_user(db:AsyncSession = Depends(db)):
+        return {"detail":"authorized route"}
 
     @router.get("/all")
     async def get_all_users(db: AsyncSession = Depends(db)):
@@ -33,7 +37,7 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
 
     @router.post("/register")
     async def create_user(user: schemas.UserCreate, db: AsyncSession = Depends(db)):
-        created_user = user_manager.create(user=user,db=db)
+        created_user = await user_manager.create(user=user,db=db)
 
         return created_user
 
@@ -47,7 +51,7 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         # write token
         token = await write_token(user_data, "pedx:auth")
         
-        return token
+        return BearerResponse(access_token=token)
 
     @router.post("/login-verify-token")
     async def verify_token(token: str, db: AsyncSession = Depends(db)):

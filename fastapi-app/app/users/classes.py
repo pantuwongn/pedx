@@ -15,11 +15,13 @@ from app.types import DependencyCallable
 
 
 class User:
-    def __init__(self) -> None:
+    def __init__(self,user:UserCreate) -> None:
+        print(user.__dict__)
         self.id = ""
-        self.username = ""
+        self.username = getattr(user,"username")
+        self.password = getattr(user,"password")
         self.hashed_password = ""
-        self.email = ""
+        self.email = getattr(user,"email")
         self.line_id = ""
         self.is_admin = False
 
@@ -28,7 +30,6 @@ class User:
 
     def __setitem__(self, key, value):
         return setattr(self, key, value)
-
 
 class UserManager:
     def __init__(self) -> None:
@@ -62,8 +63,7 @@ class UserManager:
     async def create(self, user: UserCreate, db: AsyncSession) -> str:
         try:
             helper = PasswordManager()
-            user_detail = User()
-
+            user_detail = User(user).__dict__
             await self.crud.validate_create_user(user=user, db=db)
 
             user_detail["hashed_password"] = helper.hash_password(
@@ -71,6 +71,10 @@ class UserManager:
             )
             user_detail["id"] = helper.generate_uuid(email=user.email)
 
+            # delete password key
+            if user_detail.get("password") is not None:
+                del user_detail["password"]
+            
             created_user = await self.crud.create_user(user=user_detail, db=db)
 
         except exceptions.UserAlreadyExists:

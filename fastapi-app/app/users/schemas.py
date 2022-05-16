@@ -11,5 +11,9 @@ class UserCreate(UserLogin):
     email: EmailStr
 
 class UserDetail(UserCreate):
+    id: str
     line_id: str
     is_admin: bool
+
+class UserCreateDetail(UserDetail):
+    hashed_password: str

@@ -28,7 +28,7 @@ class UsersCRUD:
 
     async def get_user_by_email(self, email: str,db:AsyncSession) -> list[_Users]:
         stmt = select(_Users).where(_Users.email == email).limit(1)
-        rs = toArray(await self.db.execute(stmt))
+        rs = toArray(await db.execute(stmt))
         if len(rs) == 0 :
             raise exceptions.EmailNotFound()
         return rs
@@ -37,7 +37,7 @@ class UsersCRUD:
         stmt = select(_Users).where(
             or_(_Users.username == user.username, _Users.email == user.email)
         )
-        rs = toArrayWithKey(await self.db.execute(stmt), _Users)
+        rs = toArrayWithKey(await db.execute(stmt), _Users)
         # d: tuple[str] = ()
         for r in rs:
             if r["username"] == user.username:
@@ -50,16 +50,10 @@ class UsersCRUD:
         # raise exceptions.InvalidPassword(list(d))
         return
 
-    async def create_user(self, user: schemas.UserCreate,db:AsyncSession):
-        # delete password key
-        dict_user = dict(user)
-        if dict_user["password"] is not None:
-            del dict_user["password"]
-        # concatenate user's dict detail
-        user_detail = dict(user_detail.__dict__, **dict_user)
-
-        stmt = insert(_Users).values(user_detail).returning(_Users.username)
+    async def create_user(self, user: schemas.UserCreateDetail,db:AsyncSession):
+        # print(user)
+        stmt = insert(_Users).values(user).returning(_Users.username)
         # rs = toArray(await db.execute(stmt))
-        rs = (await self.db.execute(stmt)).first()
-        await self.db.commit()
+        rs = (await db.execute(stmt)).first()
+        await db.commit()
         return rs
