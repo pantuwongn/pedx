@@ -4,10 +4,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # need import models for auto create
-from . import mssql, email, dblistener, users
+from . import mssql, email, dblistener
+from app.routers import users_routers
 from .database import pg_async_engine, Base
 from .socketio import SocketManager, createSocket
 from .dblistener import TestListen
+from app.dependencies import get_pg_async_db
 
 # setup database
 # isv.models.Base.metadata.create_all(bind=pg_engine)
@@ -28,7 +30,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(users.main.router)
+
+app.include_router(users_routers(get_pg_async_db), prefix="/users")
 app.include_router(mssql.main.router)
 app.include_router(email.main.router)
 app.include_router(dblistener.main.router)

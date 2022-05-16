@@ -20,6 +20,9 @@ class EmailAlreadyUsed(AppException):
     # email was used
     pass
 
+class EmailNotFound(AppException):
+    # email is not found
+    pass
 
 class InvalidPassword(AppException):
     def __init__(self, reason: str) -> None:

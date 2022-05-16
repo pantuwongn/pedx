@@ -14,11 +14,14 @@ def generate_jwt(
     data: dict,
     secret: str = JWT_SECRET,
     lifetime_hours: Optional[int] = None,
+    lifetime_seconds: Optional[int] = None,
     algorithm: str = JWT_ALGOLITHM,
 ) -> str:
     payload = data.copy()
     if lifetime_hours:
-        expire = datetime.now() + timedelta(hours=lifetime_hours)
+        expire = datetime.now() + timedelta(
+            hours=lifetime_hours, seconds=lifetime_seconds
+        )
         payload["expired_date"] = expire
     return jwt.encode(payload, secret, algorithm)
 

@@ -1,15 +1,15 @@
 from pydantic import BaseModel, EmailStr
 
 
-class UserLogin(BaseModel):
+class UserBase(BaseModel):
     username: str
+
+class UserLogin(UserBase):
     password: str
 
 class UserCreate(UserLogin):
     email: EmailStr
 
-class User(UserCreate):
-    pass
-
-    class Config:
-        orm_mode = True
+class UserDetail(UserCreate):
+    line_id: str
+    is_admin: bool
