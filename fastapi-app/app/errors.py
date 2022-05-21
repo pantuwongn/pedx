@@ -16,3 +16,7 @@ class ErrorCode(str,Enum):
     USER_NOT_VERIFIED = "User is not verfied"
     EMAIL_NOT_FOUND = "Email is not found"
     PASSWORD_INCORRECT = "Password is incorrect"
+    INVALID_AUTHENTICATION_SCHEME = "Invalid authentication scheme"
+    INVALID_TOKEN = "Invalid token or expired token"
+    INVALID_AUTHORIZATION_TOKEN = "Invalid authorization code"
+    INVALID_TOKEN_ERROR = "Invalid token authentication error"

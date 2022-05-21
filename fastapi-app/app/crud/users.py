@@ -3,37 +3,52 @@ from sqlalchemy import select, insert, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import exceptions
-from app.users import schemas
-from app.models.common import Users as _Users
+from app.schemas.users import UserCreate, UserCreateDetail
+from app.models.users import Users as _Users
 from app.functions import toArray, toArrayWithKey
-from app.dependencies import get_pg_async_db
 
 
 class UsersCRUD:
     def __init__(self):
         pass
 
-    async def get_all_users(self):
+    async def get_all_users(self, safe: bool):
+        except_column = []
+        if safe:
+            except_column.append("hashed_password")
+
         stmt = select(_Users)
-        rs = toArray(await self.db.execute(stmt))
+        rs = toArrayWithKey(await self.db.execute(stmt), _Users, except_column)
         return rs
 
-    async def get_user_by_username(self, username: str,db:AsyncSession) -> list[_Users]:
+    async def get_user_by_username(
+        self, username: str, safe: bool, db: AsyncSession
+    ) -> list[_Users]:
+        except_column = []
+        if safe:
+            except_column.append("hashed_password")
+
         stmt = select(_Users).where(_Users.username == username).limit(1)
-        rs = toArray(await db.execute(stmt))
-        print(rs)
+        rs = toArrayWithKey(await db.execute(stmt), _Users, except_column)
+        print("rs",rs)
         if len(rs) == 0:
             raise exceptions.UserNotFound()
         return rs
 
-    async def get_user_by_email(self, email: str,db:AsyncSession) -> list[_Users]:
+    async def get_user_by_email(
+        self, email: str, safe: bool, db: AsyncSession
+    ) -> list[_Users]:
+        except_column = []
+        if safe:
+            except_column.append("hashed_password")
+
         stmt = select(_Users).where(_Users.email == email).limit(1)
-        rs = toArray(await db.execute(stmt))
-        if len(rs) == 0 :
+        rs = toArrayWithKey(await db.execute(stmt), _Users, except_column)
+        if len(rs) == 0:
             raise exceptions.EmailNotFound()
         return rs
 
-    async def validate_create_user(self, user: schemas.UserCreate,db:AsyncSession) -> None:
+    async def validate_create_user(self, user: UserCreate, db: AsyncSession) -> None:
         stmt = select(_Users).where(
             or_(_Users.username == user.username, _Users.email == user.email)
         )
@@ -50,7 +65,7 @@ class UsersCRUD:
         # raise exceptions.InvalidPassword(list(d))
         return
 
-    async def create_user(self, user: schemas.UserCreateDetail,db:AsyncSession):
+    async def create_user(self, user: UserCreateDetail, db: AsyncSession):
         # print(user)
         stmt = insert(_Users).values(user).returning(_Users.username)
         # rs = toArray(await db.execute(stmt))

@@ -27,3 +27,7 @@ class EmailNotFound(AppException):
 class InvalidPassword(AppException):
     def __init__(self, reason: str) -> None:
         self.reason = reason
+
+class InvalidToken(AppException):
+    # invalid token or expired token
+    pass

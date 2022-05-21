@@ -39,3 +39,4 @@ yarn-error.log*
 
 # nginx
 certs/
+*test*
