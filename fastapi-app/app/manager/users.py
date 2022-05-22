@@ -26,7 +26,7 @@ class UserManager:
 
     async def get_current(self, token: str = Depends(oauth2_scheme)):
         print(token)
-        username = await read_token(token=token)
+        username = await read_token(token=token,token_type="access")
         return username
 
     async def get_token(self, token: str=Depends(oauth2_scheme)):

@@ -1,0 +1,12 @@
+{
+  "login": {
+    "message": {
+      "username": {
+        "require": "Please input your username"
+      },
+      "password": {
+        "require": "Please input your password"
+      }
+    }
+  }
+}

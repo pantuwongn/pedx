@@ -31,3 +31,7 @@ class InvalidPassword(AppException):
 class InvalidToken(AppException):
     # invalid token or expired token
     pass
+
+class InvalidJWEDecode(AppException):
+    # invalid JWE token data
+    pass

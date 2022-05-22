@@ -14,7 +14,6 @@ export const loaderSlice = createSlice({
   initialState,
   reducers: {
     setIsThemeLight: (state, action: PayloadAction<boolean>) => {
-      console.log(action.payload)
       state.isThemeLight = action.payload;
     },
   },

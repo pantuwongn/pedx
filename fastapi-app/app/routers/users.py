@@ -60,16 +60,16 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
 
     @router.post("/refresh", dependencies=[Depends(BearerDependency(auto_error=False))])
     async def refresh(token: str = Depends(user_manager.get_token)):
-        refresh_token = token.get("refresh_token")
+        # token = refresh token
+        # refresh_token = token.get("refresh_token")
         user = await read_token(token=token, token_type="refresh")
         new_access_token = await write_token(user, token_type="access")
-        return BearerResponse(
-            access_token=new_access_token, refresh_token=refresh_token
-        )
+        return BearerResponse(access_token=new_access_token, refresh_token=token)
 
     @router.post("/decode")
-    async def decode(token: str,type:str):
-        return await read_token(token=token,token_type=type)
+    async def decode(token: str, type: str):
+        return await read_token(token=token, token_type=type)
+
     # @router.post("/login-verify-token")
     # async def verify_token(token: str, db: AsyncSession = Depends(db)):
     #     username = await read_token(token=token, audience="pedx:auth", db=db)

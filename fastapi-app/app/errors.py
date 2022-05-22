@@ -20,3 +20,4 @@ class ErrorCode(str,Enum):
     INVALID_TOKEN = "Invalid token or expired token"
     INVALID_AUTHORIZATION_TOKEN = "Invalid authorization code"
     INVALID_TOKEN_ERROR = "Invalid token authentication error"
+    INVALID_JWE_DECODE = "Invalod token type"
