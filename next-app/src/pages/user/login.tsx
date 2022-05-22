@@ -5,8 +5,10 @@ import { Form, Input, Button } from "antd";
 import useUser from "@/lib/useUser";
 import fetchJson, { FetchError } from "@/lib/fetchJson";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const Login = () => {
+  const router = useRouter();
   const { t } = useTranslation("user");
   const [form] = Form.useForm();
   const { mutateUser } = useUser({
@@ -16,24 +18,24 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   async function onFinish(values: any) {
-    console.log("onFinish value :", values);
     const body = {
       username: values.username,
       // password: values.password,
     };
     try {
       mutateUser(
-        await fetchJson('/api/user/login', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json'},
-          body: JSON.stringify(body)
+        await fetchJson("/api/user/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         })
-      )
+      );
+      router.push("/home")
     } catch (error) {
       if (error instanceof FetchError) {
-        setErrorMsg(error.data.message)
+        setErrorMsg(error.data.message);
       } else {
-        console.error('An unexpected error happened:', error)
+        console.error("An unexpected error happened:", error);
       }
     }
   }

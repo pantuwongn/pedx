@@ -7,7 +7,8 @@ export default function useUser({
   redirectTo = "",
   redirectIfFound = false,
 } = {}) {
-  const { data: user, mutate: mutateUser } = useSWR<User>("pedx/app");
+  const { data: user, mutate: mutateUser } = useSWR<User>("/api/user/user");
+  if (typeof window !== "undefined") console.log(user);
   useEffect(() => {
     if (!redirectTo || !user) return;
 

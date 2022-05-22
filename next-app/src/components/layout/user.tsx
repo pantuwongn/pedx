@@ -2,10 +2,11 @@ import React from "react";
 import Link from "next/link";
 import useUser from "@/lib/useUser";
 import fetchJson from "@/lib/fetchJson";
+import { useRouter } from "next/router";
 
 const User = () => {
   const { user, mutateUser } = useUser();
-  console.log(user);
+  const router = useRouter();
 
   async function onLogout() {
     mutateUser(
@@ -14,17 +15,19 @@ const User = () => {
       }),
       false
     );
-    // router.push('/')
+    router.push("/home");
   }
 
   return (
     <div className="user">
       {user?.isLoggedIn ? (
-        <a href="/api/user/logout" onClick={onLogout}>
-          Logout
-        </a>
+        <Link href={"#"} passHref>
+          <a onClick={onLogout}>
+            Logout
+          </a>
+        </Link>
       ) : (
-        <Link href="/user/login">Login</Link>
+        <Link href={"/user/login"}>Login</Link>
       )}
     </div>
   );
