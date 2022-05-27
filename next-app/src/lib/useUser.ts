@@ -11,7 +11,7 @@ export default function useUser({
   if (typeof window !== "undefined") console.log(user);
   useEffect(() => {
     if (!redirectTo || !user) return;
-
+    console.log(redirectTo,redirectIfFound)
     if (
       (redirectTo && !redirectIfFound && !user?.isLoggedIn) ||
       (redirectIfFound && user?.isLoggedIn)

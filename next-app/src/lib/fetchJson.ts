@@ -9,7 +9,12 @@ export default async function fetchJson<JSON = unknown>(
   if (response.ok) {
     return data;
   }
-
+  // const json = `{"status_code": ${response.status},"message": "${data.message}"}`;
+  
+  // return JSON.parse(json);
+  // TODO check status of expired token
+  console.log(response.status)
+  console.log(data)
   throw new FetchError({
     message: response.statusText,
     response,
@@ -21,6 +26,7 @@ export class FetchError extends Error {
   response: Response;
   data: {
     message: string;
+    detail: string
   };
   constructor({
     message,
@@ -31,6 +37,7 @@ export class FetchError extends Error {
     response: Response;
     data: {
       message: string;
+      detail: string
     };
   }) {
     super(message);
@@ -41,4 +48,9 @@ export class FetchError extends Error {
     (this.name = "FetchError"), (this.response = response);
     this.data = data ?? { message: message };
   }
+}
+
+
+export interface ErrorDetail {
+  detail: string
 }

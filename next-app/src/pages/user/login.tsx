@@ -1,7 +1,7 @@
 import type { NextPage, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button,message } from "antd";
 import useUser from "@/lib/useUser";
 import fetchJson, { FetchError } from "@/lib/fetchJson";
 import { useState } from "react";
@@ -15,25 +15,25 @@ const Login = () => {
     redirectTo: "",
     redirectIfFound: true,
   });
-  const [errorMsg, setErrorMsg] = useState("");
 
   async function onFinish(values: any) {
     const body = {
       username: values.username,
-      // password: values.password,
+      password: values.password,
     };
     try {
-      mutateUser(
+      await mutateUser(
         await fetchJson("/api/user/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         })
       );
-      router.push("/home")
+      // router.push("/home");
+      router.back()
     } catch (error) {
       if (error instanceof FetchError) {
-        setErrorMsg(error.data.message);
+        message.error(error.data.detail);
       } else {
         console.error("An unexpected error happened:", error);
       }

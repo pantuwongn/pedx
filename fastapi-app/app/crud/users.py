@@ -12,7 +12,7 @@ class UsersCRUD:
     def __init__(self):
         pass
 
-    async def get_all_users(self, safe: bool):
+    async def get_all_users(self, safe: bool = True):
         except_column = []
         if safe:
             except_column.append("hashed_password")
@@ -22,7 +22,7 @@ class UsersCRUD:
         return rs
 
     async def get_user_by_username(
-        self, username: str, safe: bool, db: AsyncSession
+        self, username: str, safe: bool=True, db: AsyncSession = None
     ) -> list[_Users]:
         except_column = []
         if safe:
@@ -30,13 +30,14 @@ class UsersCRUD:
 
         stmt = select(_Users).where(_Users.username == username).limit(1)
         rs = toArrayWithKey(await db.execute(stmt), _Users, except_column)
+        print(safe)
         print("rs",rs)
         if len(rs) == 0:
             raise exceptions.UserNotFound()
         return rs
 
     async def get_user_by_email(
-        self, email: str, safe: bool, db: AsyncSession
+        self, email: str, safe: bool= True, db: AsyncSession = None
     ) -> list[_Users]:
         except_column = []
         if safe:

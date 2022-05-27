@@ -22,6 +22,11 @@ const LinkGroup = () => {
           <b>D</b>ocument <b>E</b>asy <b>A</b>ccess
         </p>
       </Link>
+      <Link href={"/energy"}>
+        <p>
+          <b>E</b>nergy <b>V</b>sualization
+        </p>
+      </Link>
     </div>
   );
 };

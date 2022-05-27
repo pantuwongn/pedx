@@ -25,7 +25,6 @@ class UserManager:
         # update detail
 
     async def get_current(self, token: str = Depends(oauth2_scheme)):
-        print(token)
         username = await read_token(token=token,token_type="access")
         return username
 

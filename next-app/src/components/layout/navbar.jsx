@@ -4,13 +4,53 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { useRouter } from "next/router";
-import { Col, Row, Switch } from "antd";
+import { Button, Col, Row, Switch } from "antd";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   isThemeLight,
   setIsThemeLight,
 } from "@/app/features/themeSwitch/themeSwitch";
-import User from './user'
+// import User from './user'
+import useUser from "@/lib/useUser";
+import fetchJson from "@/lib/fetchJson";
+
+const User = () => {
+  const { user, mutateUser } = useUser();
+  const router = useRouter();
+
+  async function onLogout() {
+    await router.push("/home");
+    mutateUser(
+      await fetchJson("/api/user/logout", {
+        method: "POST",
+      }),
+      false
+    );
+  }
+
+  return (
+    <div className="user">
+      <div className="user__avatar">
+        {user?.isLoggedIn ? (
+          <>Hi, {<b>{user?.username}</b>}</>
+        ) : (
+          "Hi guest !"
+        )}
+      </div>
+      <div className="user__button">
+        {user?.isLoggedIn ? (
+          // <Link href={"#"} passHref>
+          //   <a onClick={onLogout}>Logout</a>
+          // </Link>
+          <Button type="default" onClick={onLogout}>Logout</Button>
+        ) : (
+          // <Link href={"/user/login"}>Login</Link>
+          <Button type="default" onClick={() => router.push("/user/login")}>Login</Button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const LogoLink = React.forwardRef(({ onClick, href }, ref) => {
   return (
@@ -65,7 +105,7 @@ const LanguageSelector = () => {
       {router.locales?.map((locale, index) => {
         if (router.locale !== locale) {
           return (
-            <Link href={`${router.basePath}`} locale={locale} key={index}>
+            <Link href={`${router.pathname}`} locale={locale} key={index}>
               {locale.toUpperCase()}
             </Link>
           );
@@ -74,7 +114,6 @@ const LanguageSelector = () => {
     </div>
   );
 };
-
 
 const Navbar = () => {
   return (

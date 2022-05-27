@@ -56,15 +56,26 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         access_token = await write_token(username, token_type="access")
         refresh_token = await write_token(username, token_type="refresh")
 
-        return BearerResponse(access_token=access_token, refresh_token=refresh_token)
+        return BearerResponse(
+            username=user.username,
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
 
-    @router.post("/refresh", dependencies=[Depends(BearerDependency(auto_error=False))])
+    @router.post(
+        "/refresh",
+        dependencies=[
+            Depends(BearerDependency(token_type="refresh", auto_error=False))
+        ],
+    )
     async def refresh(token: str = Depends(user_manager.get_token)):
         # token = refresh token
         # refresh_token = token.get("refresh_token")
         user = await read_token(token=token, token_type="refresh")
         new_access_token = await write_token(user, token_type="access")
-        return BearerResponse(access_token=new_access_token, refresh_token=token)
+        return BearerResponse(
+            username=user, access_token=new_access_token, refresh_token=token
+        )
 
     @router.post("/decode")
     async def decode(token: str, type: str):

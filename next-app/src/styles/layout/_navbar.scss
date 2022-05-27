@@ -22,7 +22,20 @@
       width: fit-content;
     }
     .user {
-      padding-right: 1.5rem;
+      padding-right: 1.3rem;
+      display: flex;
+      align-items: center;
+      &__avatar {
+        font-size: 1.2rem;
+      }
+      &__button {
+        padding: 0 0.3rem;
+        margin-left: 0.5rem;
+        button {
+          padding: 0 0.2rem;
+          height: fit-content;
+        }
+      }
     }
   }
   .logo-link {

@@ -18,9 +18,9 @@ class EmailSchema(BaseModel):
 
 
 conf = ConnectionConfig(
-    MAIL_USERNAME=config["EMAIL"],
-    MAIL_PASSWORD=config["PASS"],
-    MAIL_FROM=config["EMAIL"],
+    MAIL_USERNAME=config["EMAIL_ADDRESS"],
+    MAIL_PASSWORD=config["EMAIL_PASS"],
+    MAIL_FROM=config["EMAIL_ADDRESS"],
     MAIL_PORT=587,
     MAIL_SERVER="smtp.gmail.com",
     MAIL_TLS=True,

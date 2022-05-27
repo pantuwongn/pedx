@@ -15,6 +15,34 @@ This project was use
 
 ## Getting Started
 
+First, define environment variable value for service
+
+#### Next.js environment (.env.production/development)
+```bash
+# Secret key for encrypt and decrypt cookie for 'swr'
+SECRET_COOKIE_PASSWORD = ...
+# URL address of backend server
+BASE_URL_BACKEND = http://127.0.0.1:8000
+```
+
+#### FastAPI environment (.env)
+```bash
+# email for use as sender notification
+EMAIL_ADDRESS = "...@gmail.com"
+EMAIL_PASS = "..."
+# JWK secret key for encrypt and decrypt JWE token
+# generate by python
+# >>> from jwcrypto import jwk
+# >>> key = jwk.JWK(generate='oct',size=256)
+# >>> key.export()
+JWK_KEY = '{"k":"...","kty":"oct"}'
+JWK_REFRESH_KEY = '{"k":"...","kty":"oct"}'
+# Age of generated JWE token
+# units of access value = minute, refresh = days
+LIFETIME_ACCESS = ...
+LIFETIME_REFRESH = ...
+```
+
 After install Docker (or Docker desktop on Windows):
 
 ```bash

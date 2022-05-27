@@ -25,6 +25,7 @@ lifetime_refresh = config["LIFETIME_REFRESH"]  # days
 
 
 class BearerResponse(BaseModel):
+    username: str
     access_token: str
     refresh_token: str
     token_type: str = "Bearer"
@@ -33,7 +34,7 @@ class BearerResponse(BaseModel):
 async def write_token(
     username: UserCreateDetail,
     # audience: str = "pedx:auth",
-    token_type: str = "refresh",
+    token_type: str = "access",
 ) -> Dict[str, str]:
     if token_type not in ["access", "refresh"]:
         raise ValueError("token_type must be between 'access' or 'refresh'")
@@ -44,12 +45,12 @@ async def write_token(
         # "is_admin": user_data["is_admin"],
         # "aud": [audience],
     }
-    if token_type == "access":
+    if token_type == "refresh":
         return generate_jwe(
-            data=data, token_type=token_type, lifetime_minutes=lifetime_access
+            data=data, token_type=token_type, lifetime_days=int(lifetime_access)
         )
     else:
-        return generate_jwe(data=data, lifetime_days=lifetime_refresh)
+        return generate_jwe(data=data, lifetime_minutes=int(lifetime_refresh))
 
 
 # async def refresh_token(token: str = Depends(oauth2_scheme)):
@@ -86,7 +87,7 @@ async def read_token(
 
 
 class BearerDependency(HTTPBearer):
-    def __init__(self, token_type: str = "refresh", auto_error: bool = True):
+    def __init__(self, token_type: str = "access", auto_error: bool = True):
         super(BearerDependency, self).__init__(auto_error=auto_error)
         self.token_type = token_type
 
@@ -112,3 +113,5 @@ class BearerDependency(HTTPBearer):
                 )
         except jwk.InvalidJWKValue:
             raise HTTPException(status_code=403, detail=ErrorCode.INVALID_TOKEN_ERROR)
+        except exceptions.InvalidJWEDecode:
+            raise HTTPException(status_code=403, detail=ErrorCode.INVALID_JWE_DECODE)

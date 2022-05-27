@@ -1,0 +1,8 @@
+.login {
+  &__form {
+    &__errorMsg {
+      color: red !important;
+      font-style: italic;
+    }
+  }
+}
