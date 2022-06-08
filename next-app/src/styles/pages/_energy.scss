@@ -1,5 +1,11 @@
 .energy-demo {
   height: fit-content;
+  &__operation {
+    text-align: center;
+    button {
+      margin: 0 1rem;
+    }
+  }
   &__real-time {
     display: flex;
     gap: 3rem;

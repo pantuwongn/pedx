@@ -1,7 +1,7 @@
 import json
 from jwcrypto import jwt, jwk, jwe
 from datetime import datetime, timedelta
-from typing import Any, List, Optional, Dict
+from typing import Any, Optional, Dict
 from dotenv import dotenv_values
 
 from app import exceptions

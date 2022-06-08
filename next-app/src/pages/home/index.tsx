@@ -33,16 +33,17 @@ const LinkGroup = () => {
 
 const Home: NextPage = () => {
   const { t } = useTranslation("common");
-  let msg: Message = new Message({})
-
+  let msg: Message = new Message({});
 
   return (
     <div className="home center-main">
       <main className="home-content">
-        <h1>
-          {t("welcome")} <b>PE application</b>
-        </h1>
-        <LinkGroup />
+        <div className="link-content">
+          <h1>
+            {t("welcome")} <b>PE application</b>
+          </h1>
+          <LinkGroup />
+        </div>
       </main>
     </div>
   );

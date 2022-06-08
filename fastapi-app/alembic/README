@@ -2,11 +2,11 @@ Generic single-database configuration with an async dbapi.
 
 ```
 # make migrations
-alembic revision --autogenerate "revision-name"
+alembic revision --autogenerate --rev-id "revision-id to indexing" -m "revision-name"
 # upgrade to latest migration
 alembic upgrade head
 # show revisions list
-# alembic show
+# alembic history
 ```
 
 (Alembic Sqlalchemy documentation)[https://alembic.sqlalchemy.org/en/latest/tutorial.html]

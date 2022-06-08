@@ -1,11 +1,26 @@
-$bg-color: #fafff0;
 body {
   &.dark {
     --bg-color: #383838;
-    --font-color : white;
+    --bg-color-light: #525252;
+    --bg-color-dark: #1F1F1F;
+    --font-color: white;
+    --bg-color-contrast: rgb(213, 213, 213);
+    --font-color-contrast: #202020;
   }
   & {
-    --bg-color: #fafff0;
+    --bg-color: #DFE0DC;
+    --bg-color-light: #F7F7F7;
+    --bg-color-dark: #C6C7C2;
     --font-color: #383838;
+    --bg-color-contrast: #202020;
+    --font-color-contrast: white;
   }
+  --bg-color-light-const: rgb(213, 213, 213);
+  --bg-color-dark-const: #202020;
+  --font-color-light-const: #202020;
+  --font-color-dark-const: white;
+  // --radio-button-checked-color: #313131;
+  // --radio-button-checked-border-color: #1e53ec;
+  
+  --dropdown-button-bg: var(--bg-color-light);
 }

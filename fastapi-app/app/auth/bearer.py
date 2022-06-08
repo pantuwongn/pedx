@@ -1,5 +1,5 @@
 from jwcrypto import jwt, jwk
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from datetime import datetime
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import (
@@ -13,7 +13,7 @@ from dotenv import dotenv_values
 
 from app import exceptions
 from app.auth.jwt import generate_jwe, decode_jwe
-from app.schemas.users import UserDetail, UserCreateDetail
+from app.schemas.users import UserCreate
 from app.errors import ErrorCode
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token", auto_error=False)
@@ -25,26 +25,37 @@ lifetime_refresh = config["LIFETIME_REFRESH"]  # days
 
 
 class BearerResponse(BaseModel):
-    username: str
+    uuid: str
+    user_id: str
+    firstname: str
+    lastname: str
+    email: str
+    position_id: int
+    section_code: int
+    concern_section: List[int]
+    
+    is_admin: bool
+    is_viewer: bool
+    is_recorder: bool
+    is_checker: bool
+    is_approver: bool
+    qar_recorder: bool
+    qar_editor: bool
+    
     access_token: str
     refresh_token: str
     token_type: str = "Bearer"
 
 
 async def write_token(
-    username: UserCreateDetail,
-    # audience: str = "pedx:auth",
+    user: UserCreate,
     token_type: str = "access",
 ) -> Dict[str, str]:
     if token_type not in ["access", "refresh"]:
         raise ValueError("token_type must be between 'access' or 'refresh'")
 
-    data = {
-        "username": username,
-        # "username": str(user_data["username"]),
-        # "is_admin": user_data["is_admin"],
-        # "aud": [audience],
-    }
+    data = user
+    
     if token_type == "refresh":
         return generate_jwe(
             data=data, token_type=token_type, lifetime_days=int(lifetime_access)
@@ -58,26 +69,24 @@ async def write_token(
 
 async def read_token(
     token: Optional[str],
-    # audience: str = "pedx:auth",
     token_type: str = "refresh",
-    # db: AsyncSession = None
 ) -> str:
     if token is None:
         return None
 
     try:
         data = decode_jwe(encoded_jwt=token, token_type=token_type)
-        username = data.get("username")
+        user_id = data.get("user_id")
         expired_date = data.get("expired_date")
 
         if expired_date is not None:
             expired_date = datetime.strptime(expired_date, "%Y-%m-%d %H:%M:%S.%f")
-        if username is None:
+        if user_id is None:
             return None
         if expired_date is None or expired_date < datetime.now():
             raise exceptions.InvalidToken()
 
-        return username
+        return user_id
     except jwk.InvalidJWKValue:
         raise HTTPException(status_code=403, detail=ErrorCode.INVALID_TOKEN_ERROR)
     except exceptions.InvalidToken:

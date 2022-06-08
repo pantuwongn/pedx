@@ -1,8 +1,8 @@
 import { withIronSessionApiRoute } from "iron-session/next";
-import { sessionOptions } from "@/lib/session";
-import { ErrorDetail } from "@/lib/fetchJson";
 import { NextApiRequest, NextApiResponse } from "next";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
+import { sessionOptions } from "@/lib/session";
+import { errorResponse } from "../common";
 
 export default withIronSessionApiRoute(getCurrentUser, sessionOptions);
 
@@ -19,10 +19,7 @@ async function getCurrentUser(req: NextApiRequest, res: NextApiResponse) {
       );
       res.json(data);
     } catch (error) {
-      const errorData = (error as AxiosError).response?.data as ErrorDetail;
-      res
-        .status(500)
-        .json({ message: (error as Error).message, detail: errorData?.detail || "Connection refused (Error connection)" });
+      errorResponse(res, error);
     }
   }
 }

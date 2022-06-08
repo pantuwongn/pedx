@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+from typing import Optional, Generic
 from fastapi import HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib import pwd
@@ -8,8 +8,8 @@ from passlib.context import CryptContext
 from app import exceptions
 from app.crud import UsersCRUD
 from app.errors import ErrorCode
-from app.models.users import Users
-from app.schemas.users import UserCreate, UserLogin, UserCreateDetail
+from app.models import users
+from app.schemas.users import UserCreate, UserLogin, RoleCreate
 from app.types import DependencyCallable
 from app.auth.bearer import oauth2_scheme, read_token
 
@@ -25,25 +25,25 @@ class UserManager:
         # update detail
 
     async def get_current(self, token: str = Depends(oauth2_scheme)):
-        username = await read_token(token=token,token_type="access")
-        return username
+        user_id = await read_token(token=token, token_type="access")
+        return user_id
 
-    async def get_token(self, token: str=Depends(oauth2_scheme)):
+    async def get_token(self, token: str = Depends(oauth2_scheme)):
         return token
 
     async def get_all_users(self, safe: bool = True, db: AsyncSession = None):
         return await self.crud.get_all_users(safe=safe, db=db)
 
-    async def get_by_username(
-        self, username: str, safe: bool = True, db: AsyncSession = None
+    async def get_by_user_id(
+        self, user_id: str, safe: bool = True, db: AsyncSession = None
     ):
         try:
-            user_data = await self.crud.get_user_by_username(
-                username=username, safe=safe, db=db
+            user_data = await self.crud.get_user_by_user_id(
+                user_id=user_id, safe=safe, db=db
             )
-
         except exceptions.UserNotFound:
             raise HTTPException(status_code=400, detail=ErrorCode.USER_NOT_FOUND)
+
         return user_data[0]
 
     async def get_by_email(
@@ -56,22 +56,22 @@ class UserManager:
             raise HTTPException(status_code=400, detail="Email not found")
         return user_data[0]
 
-    async def create(self, user: UserCreate, db: AsyncSession) -> str:
+    async def create(self, user: UserCreate, role: RoleCreate, db: AsyncSession) -> str:
         try:
             helper = PasswordManager()
-            user_detail = UserCreateDetail(user).__dict__
+            user_detail = UserCreate.from_orm(user).__dict__
             await self.crud.validate_create_user(user=user, db=db)
 
-            user_detail["hashed_password"] = helper.hash_password(
-                password=user.password
-            )
-            user_detail["id"] = helper.generate_uuid(email=user.email)
+            user_detail["user_pass"] = helper.hash_password(password=user.user_pass)
+            user_detail["uuid"] = helper.generate_uuid(user_id=user.user_id)
 
             # delete password key
-            if user_detail.get("password") is not None:
-                del user_detail["password"]
+            # if user_detail.get("user_pass") is not None:
+            #     del user_detail["user_pass"]
 
-            created_user = await self.crud.create_user(user=user_detail, db=db)
+            created_user = await self.crud.create_user(
+                user=user_detail, role=role, db=db
+            )
 
         except exceptions.UserAlreadyExists:
             raise HTTPException(
@@ -81,23 +81,31 @@ class UserManager:
             raise HTTPException(
                 status_code=400, detail=ErrorCode.REGISTER_EMAIL_ALREADY_USED
             )
+        except:
+            raise HTTPException(
+                status_code=400, detail="Has some problem with UserManager.create()"
+            )
         return created_user
 
-    async def authenticate(self, user: UserLogin, db: AsyncSession) -> Users:
+    async def authenticate(self, user: UserLogin, db: AsyncSession) -> users.Users:
         try:
-            user_data = await self.get_by_username(
-                username=user.username, safe=False, db=db
+            user_data = await self.get_by_user_id(
+                user_id=user.user_id, safe=False, db=db
             )
-            
+
             self.password_manager.verify_password(
-                user.password, user_data.get("hashed_password")
+                password=user.user_pass, hashed_password=user_data.get("user_pass")
             )
+
+            if user_data.get("user_pass") is not None:
+                del user_data["user_pass"]
 
             # if not user_data.is_verified:
             #     return None
+
+            return user_data
         except exceptions.PasswordIncorrect:
             raise HTTPException(status_code=400, detail=ErrorCode.PASSWORD_INCORRECT)
-        return user_data
 
 
 class PasswordManager:
@@ -109,8 +117,8 @@ class PasswordManager:
         else:
             self.context = context
 
-    def generate_uuid(self, email: str) -> str:
-        return str(uuid.uuid5(uuid.NAMESPACE_X500, email))
+    def generate_uuid(self, user_id: str) -> str:
+        return str(uuid.uuid5(uuid.NAMESPACE_X500, user_id))
 
     def hash_password(self, password: str) -> str:
         return self.context.hash(password)

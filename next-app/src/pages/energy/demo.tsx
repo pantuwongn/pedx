@@ -129,20 +129,31 @@ const EnergyDemo = () => {
       label.attr("x", startX);
       label.attr("text", 0);
       const distance = finalX - startX;
-
-      const textWidth = getTextWidth(labelText, "15px sans-serif");
+      const finalLabel = `${name} : ${labelContent} kW`;
+      const textWidth = getTextWidth(finalLabel, "15px sans-serif");
 
       label.animate((ratio: any) => {
-        let position = startX + distance * ratio;
+        var position = startX + distance * ratio;
         const text = `${name} : ${(labelContent * ratio).toFixed(0)} kW`;
+
+        let outBar = false;
         // padding + offset + adjusted
+        console.log(labelText);
+        console.log(textWidth, position);
         if (textWidth + 50 + 5 + 5 > position) {
           position += textWidth + 3;
+          outBar = true;
         }
+
+        const color = outBar ? (isLight ? "black" : "white") : "black";
+        console.log(outBar);
+        console.log(isLight);
+        console.log(color);
 
         return {
           x: position,
           text,
+          fill: color,
         };
       }, animateCfg);
     });
@@ -173,15 +184,22 @@ const EnergyDemo = () => {
         const text = `${name} : ${(+labelContent + numberDiff * ratio).toFixed(
           0
         )} kW`;
+
+        let outBar = false;
         // padding + offset + adjusted
         if (textWidth + 50 + 5 + 5 > positionX) {
           positionX += textWidth + 3;
+          outBar = true;
         }
+
+        const color = outBar ? (isLight ? "black" : "white") : "black";
+        console.log(outBar, isLight);
 
         return {
           x: positionX,
           y: positionY,
           text,
+          fill: color,
         };
       }, animateCfg);
     });
@@ -274,7 +292,7 @@ const EnergyDemo = () => {
       const traceChart = new Chart({
         container: "energy-demo__chart-container__trace-chart",
         autoFit: true,
-        padding: [40, 10, 50, 50],
+        padding: [40, 10, 30, 50],
       });
       setTraceChart(traceChart);
     }
@@ -329,15 +347,6 @@ const EnergyDemo = () => {
     }
   }, [traceData]);
 
-  function start() {
-    createChart();
-    setIsRunning(true);
-  }
-
-  function stop() {
-    setIsRunning(false);
-  }
-
   function createRaceChart() {
     if (raceChart) {
       raceChart.coordinate("rect").transpose();
@@ -358,14 +367,17 @@ const EnergyDemo = () => {
             },
           },
           title: {
-            text: "Machine",
+            text: "Machine\n",
             position: "end",
             autoRotate: false,
-            offset: -5,
+            offset: -10,
+            spacing: 0,
             style: {
               fill: isLight ? "black" : "white",
               fontSize: 15,
               fontWeight: "bold",
+              textAlign: "center",
+              lineHeight: 20,
             },
           },
         })
@@ -383,7 +395,7 @@ const EnergyDemo = () => {
             },
           },
           title: {
-            text: "Power consump.",
+            text: "Power consump. (kW)",
             position: "end",
             autoRotate: false,
             offset: 0,
@@ -392,7 +404,7 @@ const EnergyDemo = () => {
               fill: isLight ? "black" : "white",
               fontSize: 15,
               fontWeight: "bold",
-              textAlign: "right"
+              textAlign: "right",
             },
           },
         })
@@ -473,6 +485,20 @@ const EnergyDemo = () => {
             fontSize: 15,
           },
         },
+        title: {
+          text: "Power consump. (kW)\n\n",
+          position: "end",
+          autoRotate: false,
+          offset: 30,
+          spacing: 0,
+          style: {
+            fill: isLight ? "black" : "white",
+            fontSize: 15,
+            fontWeight: "bold",
+            textAlign: "left",
+            lineHeight: 20,
+          },
+        },
       });
       traceChart.axis("index", false);
       traceChart
@@ -502,6 +528,22 @@ const EnergyDemo = () => {
         showCrosshairs: true,
         shared: true,
         showTitle: false,
+        customItems: (items) => {
+          return items.map((item) => {
+            return { ...item, value: `${item.value} kW` };
+          });
+        },
+        domStyles: {
+          "g2-tooltip": {
+            padding: "0.5rem 1rem",
+          },
+          "g2-tooltip-list": {
+            fontSize: "18px",
+          },
+          "g2-tooltip-value": {
+            fontWeight: "bold",
+          },
+        },
       });
       traceChart.render();
     }
@@ -528,6 +570,21 @@ const EnergyDemo = () => {
     }
   }
 
+  function start() {
+    createChart();
+    setIsRunning(true);
+  }
+
+  function stop() {
+    setIsRunning(false);
+  }
+
+  function reset() {
+    // TODO create reset function
+    setTraceData([])
+    setRaceData([])
+  }
+
   return (
     <div className="energy-demo center-main">
       <div className="energy-demo__operation">
@@ -535,8 +592,11 @@ const EnergyDemo = () => {
         <Button type="primary" onClick={() => start()}>
           Start
         </Button>
-        <Button type="primary" danger onClick={() => stop()}>
+        <Button type="dashed" danger onClick={() => stop()}>
           Stop
+        </Button>
+        <Button type="primary" danger onClick={() => reset()}>
+          Reset
         </Button>
       </div>
       <div className="energy-demo__real-time">

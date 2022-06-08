@@ -1,8 +1,9 @@
 import type { NextPage, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Form, Input, Button,message } from "antd";
+import { Form, Input, Button, message } from "antd";
 import useUser from "@/lib/useUser";
+import { fetcher } from "@/functions/fetch";
 import fetchJson, { FetchError } from "@/lib/fetchJson";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -12,31 +13,30 @@ const Login = () => {
   const { t } = useTranslation("user");
   const [form] = Form.useForm();
   const { mutateUser } = useUser({
-    redirectTo: "",
+    redirectTo: "/home",
     redirectIfFound: true,
   });
 
   async function onFinish(values: any) {
     const body = {
-      username: values.username,
-      password: values.password,
+      user_id: values.id,
+      user_pass: values.password,
     };
     try {
       await mutateUser(
-        await fetchJson("/api/user/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        })
+        await fetcher(
+          "/api/user/login",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          },
+          true
+        )
       );
-      // router.push("/home");
-      router.back()
-    } catch (error) {
-      if (error instanceof FetchError) {
-        message.error(error.data.detail);
-      } else {
-        console.error("An unexpected error happened:", error);
-      }
+      router.back();
+    } catch {
+      message.error("Login failed");
     }
   }
 
@@ -45,7 +45,7 @@ const Login = () => {
       <div className="login__form">
         <Form form={form} name="login" onFinish={onFinish} scrollToFirstError>
           <Form.Item
-            name="username"
+            name="id"
             label="Username"
             rules={[
               {
@@ -55,7 +55,7 @@ const Login = () => {
             ]}
             hasFeedback
           >
-            <Input />
+            <Input autoComplete="false" />
           </Form.Item>
           <Form.Item
             name="password"
@@ -65,7 +65,7 @@ const Login = () => {
             ]}
             hasFeedback
           >
-            <Input.Password />
+            <Input.Password autoComplete="false" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

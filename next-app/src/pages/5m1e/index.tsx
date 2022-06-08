@@ -1,29 +1,12 @@
 import React from "react";
 import useUser from "@/lib/useUser";
-import fetchJson from "@/lib/fetchJson";
-import { Button,message } from "antd";
-import { FetchError } from "@/lib/fetchJson";
+
+import Link from "next/link";
 
 const _5M1E = () => {
   const { user } = useUser({
     redirectTo: "/user/login",
   });
-
-  async function getCurrent() {
-    try {
-      const data = await fetchJson("/api/user/getCurrentUser", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      console.log(data);
-    } catch (error) {
-      if (error instanceof FetchError) {
-        message.error(error.data.detail);
-      } else {
-        console.error("An unexpected error happened:", error);
-      }
-    }
-  }
 
   if (!user || user.isLoggedIn === false) {
     return (
@@ -35,9 +18,26 @@ const _5M1E = () => {
 
   return (
     <div className="_5m1e center-main">
-      <Button type="primary" onClick={getCurrent}>
-        Get
-      </Button>
+      <div className="link-content">
+        <h2>5M1E Report system</h2>
+        <div className="link-group">
+          <Link href="/5m1e/dashboard?t=problem">
+            <p>
+              <b>D</b>ashboard
+            </p>
+          </Link>
+          <Link href="/5m1e/report?t=problem">
+            <p>
+              <b>R</b>eport - <b>P</b>roblem
+            </p>
+          </Link>
+          <Link href="/5m1e/report?t=changepoint">
+            <p>
+              <b>R</b>eport - <b>C</b>hange <b>P</b>oint
+            </p>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

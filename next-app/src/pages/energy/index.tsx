@@ -6,9 +6,11 @@ const Energy = () => {
   const router = useRouter();
   return (
     <div className="energy center-main">
-      <h2>Energy Visualization</h2>
-      <div className="link-group">
-        <Link href={`${router.pathname}/demo`}>Demo</Link>
+      <div className="link-content">
+        <h2>Energy Visualization</h2>
+        <div className="link-group">
+          <Link href={`${router.pathname}/demo`}>Demo</Link>
+        </div>
       </div>
     </div>
   );

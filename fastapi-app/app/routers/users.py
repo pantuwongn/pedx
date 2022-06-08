@@ -2,15 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncGenerator, Type
 
-from app.schemas.users import UserCreate, UserLogin, UserDetail
+from app.schemas.users import UserCreate, UserLogin, UserDetail, RoleCreate
 from app.manager.users import UserManager
 from app.dependencies import get_pg_async_db
 from app.errors import ErrorCode
 from app.auth.bearer import BearerResponse, BearerDependency, write_token, read_token
-
-
-# TODO create router folder to centralize all router separate by module file name
-# TODO create crud folder to centralize all crud separate module by file name
 
 
 def users_routers(db: AsyncGenerator) -> APIRouter:
@@ -22,15 +18,15 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         current_user: str = Depends(user_manager.get_current),
         db: AsyncSession = Depends(db),
     ):
-        return await user_manager.get_by_username(username=current_user, db=db)
+        return await user_manager.get_by_user_id(user_id=current_user, db=db)
 
     @router.get("/all", dependencies=[Depends(BearerDependency(auto_error=False))])
     async def get_all_users(db: AsyncSession = Depends(db)):
         return await user_manager.get_all_users(db=db)
 
-    @router.get("/username", dependencies=[Depends(BearerDependency(auto_error=False))])
-    async def get_user_by_username(v: str, db: AsyncSession = Depends(db)):
-        user = await user_manager.get_by_username(username=v, db=db)
+    @router.get("/user_id", dependencies=[Depends(BearerDependency(auto_error=False))])
+    async def get_user_by_user_id(v: str, db: AsyncSession = Depends(db)):
+        user = await user_manager.get_by_user_id(user_id=v, db=db)
         return user
 
     @router.get("/email", dependencies=[Depends(BearerDependency(auto_error=False))])
@@ -39,8 +35,10 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         return user
 
     @router.post("/register")
-    async def create_user(user: UserCreate, db: AsyncSession = Depends(db)):
-        created_user = await user_manager.create(user=user, db=db)
+    async def create_user(
+        user: UserCreate, role: RoleCreate, db: AsyncSession = Depends(db)
+    ):
+        created_user = await user_manager.create(user=user, role=role, db=db)
 
         return created_user
 
@@ -50,14 +48,26 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
 
         if user_data is None:
             raise HTTPException(status_code=400, detail=ErrorCode.USER_NOT_VERIFIED)
-
         # write token
-        username = user_data["username"]
-        access_token = await write_token(username, token_type="access")
-        refresh_token = await write_token(username, token_type="refresh")
+        access_token = await write_token(user=user_data, token_type="access")
+        refresh_token = await write_token(user=user_data, token_type="refresh")
 
         return BearerResponse(
-            username=user.username,
+            uuid=user_data["uuid"],
+            user_id=user_data["user_id"],
+            firstname=user_data["firstname"],
+            lastname=user_data["lastname"],
+            email=user_data["email"],
+            position_id=user_data["position_id"],
+            section_code=user_data["section_code"],
+            concern_section=user_data["concern_section"],
+            is_admin=user_data["is_admin"],
+            is_viewer=user_data["is_viewer"],
+            is_recorder=user_data["is_recorder"],
+            is_checker=user_data["is_checker"],
+            is_approver=user_data["is_approver"],
+            qar_recorder=user_data["is_recorder"],
+            qar_editor=user_data["qar_editor"],
             access_token=access_token,
             refresh_token=refresh_token,
         )
@@ -72,9 +82,9 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         # token = refresh token
         # refresh_token = token.get("refresh_token")
         user = await read_token(token=token, token_type="refresh")
-        new_access_token = await write_token(user, token_type="access")
+        new_access_token = await write_token(user=user, token_type="access")
         return BearerResponse(
-            username=user, access_token=new_access_token, refresh_token=token
+            user_id=user, access_token=new_access_token, refresh_token=token
         )
 
     @router.post("/decode")

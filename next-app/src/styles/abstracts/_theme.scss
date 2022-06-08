@@ -1,7 +1,7 @@
 @import "variables.scss";
 body {
   background-color: var(--bg-color) !important;
-  color: var(--font-color) !important;
+  color: var(--font-color);
   a,
   b,
   p,
@@ -12,6 +12,6 @@ body {
   h5,
   h6,
   label {
-    color: var(--font-color) !important;
+    color: var(--font-color);
   }
 }

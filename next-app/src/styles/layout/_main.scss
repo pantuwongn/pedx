@@ -2,7 +2,39 @@
   // display: flex;
   // flex: 1;
   height: fit-content;
-  overflow-y: auto; // test
+  overflow-y: auto;
   border-top: 1px solid #c0c0c0;
   border-bottom: 1px solid #c0c0c0;
+  .back-button {
+    color: var(--font-color);
+    width: 40px;
+    height: 40px;
+    position: relative;
+    top: 10px;
+    left: 10px;
+    border-radius: 5px;
+    &__wrapper {
+      position: absolute;
+    }
+    &:hover,&:focus {
+      background-color: var(--bg-color-light);
+    }
+  }
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--bg-color-contrast);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: var(--bg-color-light) !important;
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: var(--bg-color-light);
+  }
 }

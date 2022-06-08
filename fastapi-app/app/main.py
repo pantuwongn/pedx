@@ -1,14 +1,13 @@
 import uvicorn
-import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # need import models for auto create
-from . import mssql, email, dblistener
+from app import mssql, email, dblistener
 from app.routers import users_routers
-from .database import pg_async_engine, Base
-from .socketio import SocketManager, createSocket
-from .dblistener import TestListen
+from app.database import pg_async_engine, Base
+from app.socketio import SocketManager, createSocket
+from app.dblistener import TestListen
 from app.dependencies import get_pg_async_db
 
 # setup database

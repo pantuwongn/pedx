@@ -10,3 +10,38 @@
   align-items: center;
   // overflow: hidden;
 }
+
+.link-content {
+  h1,
+  h2 {
+    font-size: 4rem;
+    animation: fadeInDown;
+    animation-duration: 0.8s;
+    margin-bottom: 3rem;
+  }
+  h2 {
+    font-size: 3rem;
+  }
+  .link-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    gap: 2rem;
+    animation: fadeInUp;
+    animation-duration: 0.8s;
+    > p {
+      margin: 0;
+      cursor: pointer;
+      &:hover {
+        animation: pulse;
+        animation-duration: 0.5s;
+      }
+      b {
+        font-weight: 600;
+        text-decoration: underline;
+      }
+    }
+  }
+}

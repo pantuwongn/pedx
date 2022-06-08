@@ -1,0 +1,67 @@
+{
+  "report": {
+    "message": "TH 5M1E",
+    "category": {
+      "label": "Category"
+    },
+    "problem": {
+      "label": "List"
+    },
+    "detail": {
+      "label": "Detail"
+    },
+    "product": {
+      "label": "Product"
+    },
+    "line": {
+      "label": "Line"
+    },
+    "process": {
+      "label": "Process"
+    },
+    "machine": {
+      "label": "Machine"
+    },
+    "part": {
+      "label": "Part"
+    },
+    "attachment": {
+      "label": "Attachment"
+    },
+    "note": {
+      "label": "Note"
+    }
+  },
+  "dashboard": {
+    "clear": {
+      "filter": "Clear filter",
+      "sorter": "Clear sorter"
+    },
+    "action": {
+      "cancel": {
+        "text": "Cancel",
+        "confirm": {
+          "title": "Are you sure to cancel ?",
+          "ok": "Yes",
+          "cancel": "No"
+        }
+      },
+      "reject": {
+        "text": "Reject",
+        "confirm": {
+          "title": "Are you sure to reject ?",
+          "ok": "Yes",
+          "cancel": "No"
+        }
+      },
+      "approve": {
+        "text": "Approve",
+        "confirm": {
+          "title": "Are you sure to Approve ?",
+          "ok": "Yes",
+          "cancel": "No"
+        }
+      }
+    }
+  }
+}

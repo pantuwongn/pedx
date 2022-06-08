@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,20 +33,16 @@ const User = () => {
     <div className="user">
       <div className="user__avatar">
         {user?.isLoggedIn ? (
-          <>Hi, {<b>{user?.username}</b>}</>
+          <p>Hi, {<b>{user?.firstname} {user?.lastname}</b>}</p>
         ) : (
           "Hi guest !"
         )}
       </div>
       <div className="user__button">
         {user?.isLoggedIn ? (
-          // <Link href={"#"} passHref>
-          //   <a onClick={onLogout}>Logout</a>
-          // </Link>
-          <Button type="default" onClick={onLogout}>Logout</Button>
+          <Button type="default" shape="round" onClick={onLogout}>Logout</Button>
         ) : (
-          // <Link href={"/user/login"}>Login</Link>
-          <Button type="default" onClick={() => router.push("/user/login")}>Login</Button>
+          <Button type="default" shape="round" onClick={() => router.push("/user/login")}>Login</Button>
         )}
       </div>
     </div>

@@ -1,5 +1,8 @@
 .login {
   &__form {
+    label {
+      color: var(--font-color) !important;
+    }
     &__errorMsg {
       color: red !important;
       font-style: italic;

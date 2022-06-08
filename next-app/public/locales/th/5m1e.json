@@ -1,0 +1,67 @@
+{
+  "report": {
+    "message": "TH 5M1E",
+    "category": {
+      "label": "Category"
+    },
+    "problem": {
+      "label": "List"
+    },
+    "detail": {
+      "label": "Detail"
+    },
+    "product": {
+      "label": "Product"
+    },
+    "line": {
+      "label": "Line"
+    },
+    "process": {
+      "label": "Process"
+    },
+    "machine": {
+      "label": "Machine"
+    },
+    "part": {
+      "label": "Part"
+    },
+    "attachment": {
+      "label": "Attachment"
+    },
+    "note": {
+      "label": "Note"
+    }
+  },
+  "dashboard": {
+    "clear": {
+      "filter": "ยกเลิกการกรองข้อมูล",
+      "sorter": "ยกเลิกการจัดเรียง"
+    },
+    "action": {
+      "cancel": {
+        "text": "ยกเลิก",
+        "confirm": {
+          "title": "ต้องการ \"ยกเลิก\" หรือไม่ ?",
+          "ok": "ใช่",
+          "cancel": "ยกเลิก"
+        }
+      },
+      "reject": {
+        "text": "ไม่อนุมัติ",
+        "confirm": {
+          "title": "ต้องการ \"ไม่อนุมัติ\" หรือไม่ ?",
+          "ok": "ใช่",
+          "cancel": "ยกเลิก"
+        }
+      },
+      "approve": {
+        "text": "อนุมัติ",
+        "confirm": {
+          "title": "ต้องการ \"อนุมัติ\" หรือไม่ ?",
+          "ok": "อนุมัติ",
+          "cancel": "ยกเลิก"
+        }
+      }
+    }
+  }
+}

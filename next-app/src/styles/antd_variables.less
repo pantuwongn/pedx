@@ -1,5 +1,8 @@
-@import 'antd/lib/style/themes/default.less';
-@import 'antd/dist/antd.less';
+@import "antd/lib/style/themes/default.less";
+@import "antd/dist/antd.less";
 
 @btn-font-weight: 600;
-@btn-primary-bg: hsl(171, 100%, 41%);
+// @component-background: hsl(171, 100%, 41%);
+@custom-primary-bg: hsl(171, 100%, 41%);
+@btn-primary-bg: @custom-primary-bg;
+@btn-default-bg: @custom-primary-bg;
