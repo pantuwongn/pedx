@@ -1,4 +1,4 @@
-import type { User } from "./user";
+import type { User } from "@/types/static";
 
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -23,13 +23,16 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
 
     const user = {
       isLoggedIn: true,
+      user_uuid: data.user_uuid,
       user_id: data.user_id,
       firstname: data.firstname,
       lastname: data.lastname,
       email: data.email,
       position_id: data.position_id,
-      section_code: data.section_code,
-      concern_section: data.concern_section,
+      section_id: data.section_id,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      is_active: data.is_active,
       is_admin: data.is_admin,
       is_viewer: data.is_viewer,
       is_recorder: data.is_recorder,

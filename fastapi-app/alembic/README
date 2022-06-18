@@ -1,6 +1,8 @@
-Generic single-database configuration with an async dbapi.
+## Alembic
 
-```
+Use Alembic for manager Database revision
+
+```bash
 # make migrations
 alembic revision --autogenerate --rev-id "revision-id to indexing" -m "revision-name"
 # upgrade to latest migration
@@ -8,5 +10,55 @@ alembic upgrade head
 # show revisions list
 # alembic history
 ```
+
+## Create PostgreSQL Function and Trigger to use ON UPDATE column (for updated_at column)
+
+```bash
+# in alembic revision file
+create_refresh_update_at_func = """
+    CREATE FUNCTION {schema}.refresh_updated_at()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql AS
+    $func$
+    BEGIN
+        NEW.updated_at := now();
+        RETURN NEW;
+    END
+    $func$;
+"""
+create_refresh_update_at_trigger = """
+    CREATE TRIGGER trig_{table}_updated BEFORE INSERT OR UPDATE ON {schema}.{table}
+    FOR EACH ROW EXECUTE FUNCTION {schema}.refresh_updated_at();
+"""
+create_generate_request_no_func = """
+    CREATE FUNCTION {schema}.generate_{process}_request_no()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql AS
+    $func$
+    BEGIN
+        NEW.request_no := 'EPD-{process}-' || to_char(NEW.id,'FM0000000');
+        RETURN NEW;
+    END
+    $func$;
+"""
+create_generate_request_no_trigger = """
+    CREATE TRIGGER trig_{process}_generate_request_no BEFORE INSERT OR UPDATE ON {schema}."request_no_{process}"
+    FOR EACH ROW EXECUTE FUNCTION {schema}.generate_{process}_request_no();
+"""
+
+# table list for insert trigger
+updated_at_table_list = ['...','...','...']
+generate_request_no_process_list = ['...','...','...']
+
+# on upgrade
+op.execute(sa.text(create_refresh_update_at_func.format(schema="public")))
+for t in updated_at_table_list:
+    op.execute(sa.text(create_refresh_update_at_trigger.format(schema="public", table=t)))
+
+for p in generate_request_no_process_list:
+    op.execute(sa.text(create_generate_request_no_func.format(schema="public",process=p)))
+    op.execute(sa.text(create_generate_request_no_trigger.format(schema="public",process=p)))
+```
+
 
 (Alembic Sqlalchemy documentation)[https://alembic.sqlalchemy.org/en/latest/tutorial.html]

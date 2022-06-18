@@ -2,34 +2,34 @@
   "report": {
     "message": "TH 5M1E",
     "category": {
-      "label": "Category"
+      "label": "หมวดหมู่"
     },
-    "problem": {
-      "label": "List"
+    "list": {
+      "label": "รายการ"
     },
     "detail": {
-      "label": "Detail"
+      "label": "รายละเอียด"
     },
     "product": {
-      "label": "Product"
+      "label": "ผลิตภัณฑ์"
     },
     "line": {
-      "label": "Line"
+      "label": "ไลน์การผลิต"
     },
     "process": {
-      "label": "Process"
+      "label": "กระบวนการ"
     },
     "machine": {
-      "label": "Machine"
+      "label": "เครื่องจักร"
     },
     "part": {
-      "label": "Part"
+      "label": "ชิ้นส่วน"
     },
     "attachment": {
-      "label": "Attachment"
+      "label": "ไฟล์แนบ"
     },
     "note": {
-      "label": "Note"
+      "label": "รายละเอียดเพิ่มเติม"
     }
   },
   "dashboard": {

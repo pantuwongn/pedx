@@ -10,8 +10,6 @@ config = dotenv_values(".env")
 
 JWK_ACCESS_KEY = config["JWK_ACCESS_KEY"]
 JWK_REFRESH_KEY = config["JWK_REFRESH_KEY"]
-# TODO store JWK as environment variable (use oct,256)
-# TODO change to JWE
 
 
 def generate_jwe(

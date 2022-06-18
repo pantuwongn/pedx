@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Router from "next/router";
 import useSWR from "swr";
-import { User } from "src/pages/api/user/user";
+import { User } from "@/types/static";
 
 export default function useUser({
   redirectTo = "",

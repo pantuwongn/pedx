@@ -13,7 +13,7 @@ import {
 } from "@/app/features/themeSwitch/themeSwitch";
 // import User from './user'
 import useUser from "@/lib/useUser";
-import fetchJson from "@/lib/fetchJson";
+import { fetcher } from "@/functions/fetch";
 
 const User = () => {
   const { user, mutateUser } = useUser();
@@ -22,10 +22,9 @@ const User = () => {
   async function onLogout() {
     await router.push("/home");
     mutateUser(
-      await fetchJson("/api/user/logout", {
+      await fetcher("/api/user/logout", {
         method: "POST",
-      }),
-      false
+      })
     );
   }
 

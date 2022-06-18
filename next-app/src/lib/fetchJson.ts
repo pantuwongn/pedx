@@ -1,32 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-export default async function fetchJson<JSON = unknown>(
-  config: AxiosRequestConfig
-): Promise<JSON> {
-  const response = await axios(config).then((resp) => resp);
-  const data = response.data;
-
-  if (response.status === 200) {
-    return data;
-  }
-  // const json = `{"status_code": ${response.status},"message": "${data.message}"}`;
-
-  // return JSON.parse(json);
-  // TODO check status of expired token
-  console.log(response.status);
-  console.log(data);
-  throw new FetchError({
-    message: response.statusText,
-    response,
-    data,
-  });
-}
-
-export async function fetchJsonByFetch<JSON = unknown>(
+export async function fetchJson<JSON = unknown>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<JSON> {
+  console.log('fetchJson',input,init)
   const response = await fetch(input, init);
+  console.log(response)
   const data = await response.json();
 
   if (response.ok) {
@@ -42,7 +22,7 @@ export async function fetchJsonByFetch<JSON = unknown>(
 }
 
 export class FetchError extends Error {
-  response: AxiosResponse;
+  response: Response;
   data: {
     message: string;
     detail: string;
@@ -53,7 +33,7 @@ export class FetchError extends Error {
     data,
   }: {
     message: string;
-    response: AxiosResponse;
+    response: Response;
     data: {
       message: string;
       detail: string;

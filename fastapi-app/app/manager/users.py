@@ -63,7 +63,7 @@ class UserManager:
             await self.crud.validate_create_user(user=user, db=db)
 
             user_detail["user_pass"] = helper.hash_password(password=user.user_pass)
-            user_detail["uuid"] = helper.generate_uuid(user_id=user.user_id)
+            user_detail["user_uuid"] = helper.generate_uuid(user_id=user.user_id)
 
             # delete password key
             # if user_detail.get("user_pass") is not None:
@@ -81,10 +81,8 @@ class UserManager:
             raise HTTPException(
                 status_code=400, detail=ErrorCode.REGISTER_EMAIL_ALREADY_USED
             )
-        except:
-            raise HTTPException(
-                status_code=400, detail="Has some problem with UserManager.create()"
-            )
+        except BaseException as e:
+            raise HTTPException(status_code=400, detail=str(e))
         return created_user
 
     async def authenticate(self, user: UserLogin, db: AsyncSession) -> users.Users:

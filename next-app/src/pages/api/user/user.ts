@@ -2,27 +2,7 @@ import { sessionOptions } from "@/lib/session";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export type User = {
-  isLoggedIn: boolean;
-  user_id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  position_id: number;
-  section_code: number;
-  concern_section: Array<string>;
-  is_admin: boolean;
-  is_viewer: boolean;
-  is_recorder: boolean;
-  is_checker: boolean;
-  is_approver: boolean;
-  qar_recorder: boolean;
-  qar_editor: boolean;
-
-  avatarUrl: string;
-  access_token: string;
-  refresh_token: string;
-};
+import type { User } from "@/types/static";
 
 export default withIronSessionApiRoute(userRoute, sessionOptions);
 
@@ -33,13 +13,16 @@ async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
   } else {
     res.json({
       isLoggedIn: false,
+      user_uuid: "",
       user_id: "",
       firstname: "",
       lastname: "",
       email: "",
       position_id: 0,
-      section_code: 0,
-      concern_section: [],
+      section_id: 0,
+      created_at: "",
+      updated_at: "",
+      is_active: false,
       is_admin: false,
       is_viewer: false,
       is_recorder: false,

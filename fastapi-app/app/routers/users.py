@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import AsyncGenerator, Type
+from typing import AsyncGenerator
 
 from app.schemas.users import UserCreate, UserLogin, UserDetail, RoleCreate
 from app.manager.users import UserManager
@@ -51,15 +51,15 @@ def users_routers(db: AsyncGenerator) -> APIRouter:
         # write token
         access_token = await write_token(user=user_data, token_type="access")
         refresh_token = await write_token(user=user_data, token_type="refresh")
-
+        
         return BearerResponse(
-            uuid=user_data["uuid"],
+            user_uuid=user_data["user_uuid"],
             user_id=user_data["user_id"],
             firstname=user_data["firstname"],
             lastname=user_data["lastname"],
             email=user_data["email"],
             position_id=user_data["position_id"],
-            section_code=user_data["section_code"],
+            section_id=user_data["section_id"],
             concern_section=user_data["concern_section"],
             is_admin=user_data["is_admin"],
             is_viewer=user_data["is_viewer"],

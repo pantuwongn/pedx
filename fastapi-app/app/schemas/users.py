@@ -22,10 +22,13 @@ class UserCreate(UserLogin):
     email: EmailStr
     app_line_id: Optional[str] = ""
     position_id: int
-    section_code: int
-    concern_section: Optional[List[int]] = "[]"
+    section_id: int
+    is_active: bool = False
     class Config:
         orm_mode = True
         
 class UserDetail(UserCreate):
+    user_uuid: str
     user_id: str
+    created_at: str
+    updated_at: str

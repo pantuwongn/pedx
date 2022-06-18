@@ -1,14 +1,11 @@
-import { GetStaticProps } from "next";
+import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   Button,
   Form,
-  Space,
   Input,
   Radio,
   Checkbox,
-  Dropdown,
-  Menu,
   Upload,
   message,
   Modal,
@@ -25,22 +22,26 @@ import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { getBase64 } from "@/functions/common";
 import { useRouter } from "next/router";
 import useUser from "@/lib/useUser";
+import type { ReportDataType } from "@/types/5m1e";
+import { fetcher } from "@/functions/fetch";
+import type {
+  ProductType,
+  LineType,
+  ProcessType,
+  MachineType,
+  PartType,
+  CategoryType,
+  ListItemType,
+  ListItemDataType,
+  ItemDetailType,
+  LinePartType,
+  ProcessMachineType,
+  PartMachineType,
+  RequestProcessType,
+} from "@/types/static";
 
 const { TextArea } = Input;
 const { Option } = Select;
-
-interface LineType {
-  [lineid: string]: {
-    name: string;
-    code: string;
-    wc: string;
-  };
-}
-
-interface PartType {
-  no: string;
-  name: string;
-}
 
 const categories = [
   "Man",
@@ -51,194 +52,68 @@ const categories = [
   "Environment",
 ];
 
-const problems: {
-  [key: string]: { [key: string]: { tag: string; details: string[] } };
-} = {
-  Man: {
-    "1": {
-      tag: "เกิดอุบัติเหตุกับพนักงาน",
-      details: ["Man1-1", "Man1-2", "Man1-3"],
-    },
-    "2": {
-      tag: "พนักงานไม่พอ ผลิตงานแบบปกติไม่ได้",
-      details: ["Man2-1", "Man2-2", "Man2-3"],
-    },
-    "3": {
-      tag: "พนักงานไม่พอ ต้องหยุดการผลิต",
-      details: ["Man3-1", "Man3-2", "Man3-3"],
-    },
-  },
-  Machine: {
-    "1": {
-      tag: "เครื่องจักรเสียต้องหยุดการผลิต",
-      details: ["Machine1-1", "Machine1-2", "Machine1-3"],
-    },
-    "2": {
-      tag: "Jig ประกอบเสียใช้งานไม่ได้",
-      details: ["Machine2-1", "Machine2-2", "Machine2-3"],
-    },
-    "3": {
-      tag: "Die/Mold เสีย ต้องหยุดการผลิต",
-      details: ["Machine3-1", "Machine3-2", "Machine3-3"],
-    },
-    "4": {
-      tag: "Tooling เสีย ใช้งานไม่ได้",
-      details: ["Machine4-1", "Machine4-2", "Machine4-3"],
-    },
-    "5": {
-      tag: "Sensor เสีย ใช้งานไม่ได้",
-      details: ["Machine5-1", "Machine5-2", "Machine5-3"],
-    },
-  },
-  Method: {
-    "1": {
-      tag: "ผลิตงานด้วย Condition/Parameter เดิมไม่ได้ ต้องหยุดการผลิต",
-      details: ["Method1-1", "Method1-2", "Method1-3"],
-    },
-    "2": {
-      tag: "ผลิตงานด้วยวิธีการเดิมไม่ได้",
-      details: ["Method2-1", "Method2-2", "Method2-3"],
-    },
-  },
-  Material: {
-    "1": {
-      tag: "Material/Part ที่ใช้ประกอบเสีย ต้องหยุดการผลิต",
-      details: ["Material1-1", "Material1-2", "Material1-3"],
-    },
-    "2": {
-      tag: "Material/Part ผิด spec",
-      details: ["Material2-1", "Material2-2", "Material2-3"],
-    },
-  },
-  Measurement: {
-    "1": {
-      tag: "เครื่องมือวัดเสีย ใช้วัดชิ้นงานไม่ได้",
-      details: ["Meas1-1", "Meas1-2", "Meas1-3"],
-    },
-    "2": {
-      tag: "Jig เช็คงานเสีย ใช้งานไม่ได้",
-      details: ["Meas2-1", "Meas2-2", "Meas2-3"],
-    },
-    "3": {
-      tag: "Master เสีย ใช้งานไม่ได้",
-      details: ["Meas3-1", "Meas3-2", "Meas3-3"],
-    },
-    "4": {
-      tag: "Pokayoke เสีย ใช้ป้องกันไม่ได้",
-      details: ["Meas4-1", "Meas4-2", "Meas4-3"],
-    },
-    "5": {
-      tag: "นำเครื่องมือวัดไปทำการสอบเทียบ",
-      details: ["Meas5-1", "Meas5-2", "Meas5-3"],
-    },
-    "6": {
-      tag: "นำ Master ไปทำการสอบเทียบ",
-      details: ["Meas6-1", "Meas6-2", "Meas6-3"],
-    },
-  },
-  Environment: {
-    "1": { tag: "ไฟดับ", details: ["Envi1-1", "Envi1-2", "Envi1-3"] },
-    "2": {
-      tag: "อุณหภูมิ หรือ ความชื้น เกินกว่าที่กำหนด",
-      details: ["Envi2-1", "Envi2-2", "Envi2-3"],
-    },
-    "3": { tag: "โยกย้าย Machine", details: ["Envi3-1", "Envi3-2", "Envi3-3"] },
-    "4": {
-      tag: "หยุดไลน์เพื่อทำการผลิตงาน Trial",
-      details: ["Envi4-1", "Envi4-2", "Envi4-3"],
-    },
-  },
+type ReportPropsTypes = {
+  request_processes: RequestProcessType
+  list_items_problem: ListItemType;
+  list_items_changepoint: ListItemType;
+  item_details: ItemDetailType;
+  products: ProductType;
+  lines: LineType;
+  lines_parts: LinePartType;
+  processes: ProcessType;
+  processes_machines: ProcessMachineType;
+  machines: MachineType;
+  parts: PartType;
+  parts_machines: PartMachineType;
 };
 
-const products = ["STA", "ALT", "ECC", "PART"];
-
-const lines: {
-  [product: string]: LineType;
-} = {
-  STA: {
-    "1": { name: "STA-Line1", code: "4201", wc: "S100" },
-    "2": { name: "STA-Line2", code: "4202", wc: "S101" },
-    "3": { name: "STA-Line3", code: "4203", wc: "S102" },
-  },
-  ALT: {
-    "1": { name: "ALT-Line1", code: "4101", wc: "A100" },
-    "2": { name: "ALT-Line2", code: "4102", wc: "A101" },
-    "3": { name: "ALT-Line3", code: "4103", wc: "A102" },
-  },
-  ECC: {
-    "1": { name: "ECC-Line1", code: "4001", wc: "E100" },
-    "2": { name: "ECC-Line2", code: "4002", wc: "E101" },
-    "3": { name: "ECC-Line3", code: "4003", wc: "E102" },
-  },
-  PART: {
-    "1": { name: "PART-Line1", code: "4301", wc: "P100" },
-    "2": { name: "PART-Line2", code: "4302", wc: "P101" },
-    "3": { name: "PART-Line3", code: "4303", wc: "P102" },
-  },
-};
-
-const procs: { [lineId: string]: string[] } = {
-  "1": ["Line_1_Proc_1", "Line_1_Proc_2", "Line_1_Proc_3"],
-  "2": ["Line_2_Proc_1", "Line_2_Proc_2", "Line_2_Proc_3"],
-  "3": ["Line_3_Proc_1", "Line_3_Proc_2", "Line_3_Proc_3"],
-};
-
-const machines: { [process: string]: string[] } = {
-  "1": ["Proc_1_MC_1", "Proc_1_MC_2", "Proc_1_MC_3"],
-  "2": ["Proc_2_MC_1", "Proc_2_MC_2", "Proc_2_MC_3"],
-  "3": ["Proc_3_MC_1", "Proc_3_MC_2", "Proc_3_MC_3"],
-};
-
-const parts: { [lineid: string]: PartType[] } = {
-  "1": [
-    { no: "TG100001", name: "Line1_part-1" },
-    { no: "TG100002", name: "Line1_part-2" },
-    { no: "TG100003", name: "Line1_part-3" },
-  ],
-  "2": [
-    { no: "TG200001", name: "Line2_part-1" },
-    { no: "TG200002", name: "Line2_part-2" },
-    { no: "TG200003", name: "Line2_part-3" },
-  ],
-  "3": [
-    { no: "TG300001", name: "Line3_part-1" },
-    { no: "TG300002", name: "Line3_part-2" },
-    { no: "TG300003", name: "Line3_part-3" },
-  ],
-};
-
-const Report = () => {
+const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
   const { user } = useUser({
     redirectTo: "/user/login",
   });
+  const {
+    request_processes,
+    list_items_problem,
+    list_items_changepoint,
+    item_details,
+    products,
+    lines,
+    lines_parts,
+    processes,
+    processes_machines,
+    machines,
+    parts,
+    parts_machines,
+  }: ReportPropsTypes = props;
+  const list_items: {
+    [type: string]: ListItemType;
+  } = {
+    problem: list_items_problem,
+    changepoint: list_items_changepoint,
+  };
 
-  if (!user || user.isLoggedIn === false) {
-    return (
-      <div className="_5m1e center-main">
-        <p>Not logged in yet, please log in before use this page.</p>
-      </div>
-    );
-  }
   const { t } = useTranslation("5m1e");
   const router = useRouter();
   const pathQuery = router.query;
+  const { t: path_t = "problem" } = pathQuery;
   const [form] = Form.useForm();
-  const [detailList, setDetailList] = useState<string[]>([]);
+  const [itemList, setItemList] = useState<ListItemDataType[]>([]);
+  const [detailList, setDetailList] = useState<ItemDetailType>();
   const [lineList, setLineList] = useState<LineType>();
-  const [processList, setProcessList] = useState<string[]>([]);
-  const [machineList, setMachineList] = useState<string[]>([]);
-  const [partList, setPartList] = useState<PartType[]>();
+  const [processList, setProcessList] = useState<ProcessType>();
+  const [machineList, setMachineList] = useState<MachineType>();
+  const [partList, setPartList] = useState<PartType>();
 
-  const [categoryValue, setCategoryValue] = useState<string>();
-  const [problemSelectedValue, setProblemSelectedValue] = useState<string>();
+  const [categoryValue, setCategoryValue] = useState<CategoryType>();
+  const [listItemSelectedValue, setListItemSelectedValue] = useState<string>();
   const [detailSelectedValues, setDetailSelectedValues] = useState<string[]>(
     []
   );
-  const [product, setProduct] = useState<string>();
+  const [productId, setProductId] = useState<string>();
   const [lineId, setLineId] = useState<string>();
-  const [process, setProcess] = useState<string>();
-  const [machine, setMachine] = useState<string>();
-  const [part, setPart] = useState<string>();
+  const [processId, setProcessId] = useState<string>();
+  const [machineNo, setMachineNo] = useState<string>();
+  const [partNo, setPartNo] = useState<string>();
   const [previewUploadVisible, setPreviewUploadVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -248,6 +123,7 @@ const Report = () => {
   const [noteChanged, setNoteChanged] = useState(false);
   const [inputChanged, setInputChanged] = useState(false);
   const [inputCompleted, setInputCompleted] = useState(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const uploadButton = (
     <div className="upload-button">
@@ -261,53 +137,112 @@ const Report = () => {
   }, [pathQuery]);
 
   useEffect(() => {
+    if (!path_t) return;
+    if (!categoryValue) return;
+
+    setItemList(list_items[path_t.toString()][categoryValue]);
+
     // reset "List" when change "Category"
-    setProblemSelectedValue(undefined);
-    form.resetFields(["problem"]);
+    setListItemSelectedValue(undefined);
+    form.resetFields(["list"]);
   }, [categoryValue]);
 
   useEffect(() => {
-    // reset "Detail" list when change "List"
     if (!categoryValue) return;
-    if (!problemSelectedValue) return;
+    if (!listItemSelectedValue) return;
 
-    setDetailList(problems[categoryValue][problemSelectedValue]["details"]);
-    setDetailSelectedValues([])
+    setDetailList(
+      Object.entries(item_details)
+        .filter(
+          ([id, data]) =>
+            data.list_item_id?.toString() === listItemSelectedValue
+        )
+        .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {})
+    );
+    // reset "Detail" list when change "List"
+    setDetailSelectedValues([]);
     form.resetFields(["detail"]);
-  }, [problemSelectedValue]);
+  }, [listItemSelectedValue]);
 
   useEffect(() => {
-    if (!product) return;
+    if (!productId) return;
 
-    setLineList(lines[product]);
+    // product to part
+    const partsProducts = Object.entries(parts)
+      .filter(([, data]) => data.product_id.toString() === productId)
+      .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {});
+    // part to lines_parts
+    const linesProduct = Object.entries(lines_parts)
+      .filter(([, data]) => Object.keys(partsProducts).includes(data.part_no))
+      .map((data) => data[1].line_id?.toString());
+    setLineList(
+      Object.entries(lines)
+        .filter((line) => linesProduct.includes(line[0]))
+        .reduce(
+          (acc, cur) => ({
+            ...acc,
+            [cur[0]]: cur[1],
+          }),
+          {}
+        )
+    );
     // reset "Line"
-    setLineId(undefined)
+    setLineId(undefined);
     form.resetFields(["line"]);
-  }, [product]);
+  }, [productId]);
 
   useEffect(() => {
-    if (!lineId) return;
-
-    setProcessList(procs[lineId]);
+    if (!lineId) {
+      setProcessList(undefined);
+    } else {
+      setProcessList(
+        Object.entries(processes)
+          .filter(([, data]) => data.line_id?.toString() === lineId)
+          .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {})
+      );
+    }
     // reset "Process"
+    setProcessId(undefined);
     form.resetFields(["process"]);
   }, [lineId]);
 
   useEffect(() => {
-    if (!process) return;
-
-    setMachineList(machines[process.charAt(process.length - 1)]);
+    if (!processId) {
+      setMachineList(undefined);
+    } else {
+      // process to machine
+      const processesMachines = Object.entries(processes_machines)
+        .filter(([, data]) => data.process_id?.toString() === processId)
+        .map((data) => data[1].machine_no);
+      setMachineList(
+        Object.entries(machines)
+          .filter(([no]) => processesMachines.includes(no))
+          .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {})
+      );
+    }
     // reset "Machine"
+    setMachineNo(undefined);
     form.resetFields(["machine"]);
-  }, [process]);
+  }, [processId]);
 
   useEffect(() => {
-    if (!machine) return;
-
-    setPartList(parts[machine.charAt(machine.length - 1)]);
+    if (!machineNo) {
+      setPartList(undefined);
+    } else {
+      // machine to part
+      const machinesParts = Object.entries(parts_machines)
+        .filter(([, data]) => data.machine_no?.toString() === machineNo)
+        .map((data) => data[1].part_no);
+      setPartList(
+        Object.entries(parts)
+          .filter(([no]) => machinesParts.includes(no))
+          .reduce((acc, cur) => ({ ...acc, [cur[0]]: cur[1] }), {})
+      );
+    }
     // reset "Part"
+    setPartNo(undefined);
     form.resetFields(["part"]);
-  }, [machine]);
+  }, [machineNo]);
 
   useEffect(() => {
     // set inputChanged status
@@ -315,9 +250,9 @@ const Report = () => {
     // set completed status
     if (
       !categoryValue ||
-      !problemSelectedValue ||
+      !listItemSelectedValue ||
       !(detailSelectedValues.length > 0) ||
-      !product ||
+      !productId ||
       !lineId
     ) {
       setInputCompleted(false);
@@ -327,9 +262,9 @@ const Report = () => {
     setInputCompleted(true);
   }, [
     categoryValue,
-    problemSelectedValue,
+    listItemSelectedValue,
     detailSelectedValues,
-    product,
+    productId,
     lineId,
   ]);
 
@@ -337,44 +272,92 @@ const Report = () => {
 
   // TODO status isChanged for confirm back or discard
 
-  function onSubmit(values: any) {
+  async function onSubmit(values: any) {
     console.log("onSubmit");
     console.log(values);
+    setSubmitting(true);
+    const reportData = { ...getReportData(values), user: user };
+    const data = await fetcher("/api/5m1e/report/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reportData),
+    });
+
+    if (data) {
+      message.success(`Submit completed, Request id: ${data.request_id}`, 5);
+      onReset();
+    } else {
+      message.error(`Submit response return was error (response is ${data})`);
+    }
+
+    setSubmitting(false);
   }
 
-  function onSave() {
+  async function onSave() {
     console.log("onSave");
+    const values = form.getFieldsValue(true);
+    const reportData = getReportData(values);
   }
 
-  function onCancel(values: any) {
+  function onReset() {
     console.log("onCancel");
-    console.log(values);
+    form.resetFields();
+    setCategoryValue(undefined);
+    setItemList([]);
+    setListItemSelectedValue(undefined);
+    setDetailSelectedValues([]);
+    setProductId(undefined);
+  }
+
+  function getReportData(values: any): ReportDataType {
+    const detailValue: string[] = values.detail.map((detail: string) =>
+      detail === "other"
+        ? `${detail}:${
+            (document.getElementById("detail-input") as HTMLInputElement).value
+          }`
+        : detail
+    );
+    const request_process_id = path_t ==='problem' ? 1 : 2
+    return {
+      request_process_id: request_process_id,
+      request_process_name: request_processes[request_process_id].request_process_short_name,
+      state_id: path_t ==='problem' ? 1 : 2,
+      // TODO state_id for changepoint
+      category: values.category,
+      list: values.list,
+      detail: detailValue,
+      product_id: values.product,
+      line_id: parseInt(values.line),
+      process_id: values.process || "-",
+      machine_no: values.machine || "-",
+      part_no: values.part || "-",
+      attachment: values.attachment || [],
+      note: values.note || "",
+    };
   }
 
   function onCategoryChange(e: RadioChangeEvent) {
     setCategoryValue(e.target.value);
   }
 
-  function onProblemChange(e: RadioChangeEvent) {
-    setProblemSelectedValue(e.target.value);
+  function onListItemChange(e: RadioChangeEvent) {
+    setListItemSelectedValue(e.target.value);
   }
 
   function onDetailChange(e: CheckboxChangeEvent) {
     let newSelected = [...detailSelectedValues];
-    if (newSelected.includes(e.target.value)) {
-      newSelected.filter((v) => v !== e.target.value);
-    } else {
+    if (e.target.checked) {
       newSelected.push(e.target.value);
+    } else {
+      newSelected = newSelected.filter((v) => v !== e.target.value);
     }
     setDetailSelectedValues(newSelected);
   }
 
-  function clearDetail() {
-    setDetailSelectedValues([]);
-  }
-
   function onProductChange(value: string) {
-    setProduct(value);
+    setProductId(value);
   }
 
   function onLineChange(value: string) {
@@ -382,15 +365,15 @@ const Report = () => {
   }
 
   function onProcessChange(value: string) {
-    setProcess(value);
+    setProcessId(value);
   }
 
   function onMachineChange(value: string) {
-    setMachine(value);
+    setMachineNo(value);
   }
 
   function onPartChange(value: string) {
-    setPart(value);
+    setPartNo(value);
   }
 
   const beforeUpload = (file: RcFile) => {
@@ -431,6 +414,17 @@ const Report = () => {
     );
   };
 
+  if (!user || user.isLoggedIn === false) {
+    return (
+      <div className="_5m1e center-main">
+        <p>Not logged in yet, please log in before use this page.</p>
+      </div>
+    );
+  }
+
+  // TODO define minimum position level for report
+  // if (!user || user.position_id)
+
   return (
     <div className="_5m1e__report center-main">
       <h3>5M1E Report system - Report {pathQuery.t}</h3>
@@ -440,7 +434,7 @@ const Report = () => {
         name="5m1e-report-form"
         onFinish={onSubmit}
         scrollToFirstError
-        onReset={onCancel}
+        onReset={onReset}
       >
         <Form.Item
           name="category"
@@ -462,20 +456,20 @@ const Report = () => {
         </Form.Item>
         {categoryValue && (
           <Form.Item
-            name="problem"
-            className="_5m1e__report__form__problem"
-            label={t("report.problem.label")}
+            name="list"
+            className="_5m1e__report__form__list"
+            label={t("report.list.label")}
             required
           >
-            <div className="_5m1e__report__form__problem__wrapper">
+            <div className="_5m1e__report__form__list__wrapper">
               <Radio.Group
-                value={problemSelectedValue}
-                onChange={onProblemChange}
+                value={listItemSelectedValue}
+                onChange={onListItemChange}
               >
-                {Object.entries(problems[categoryValue])?.map(
-                  ([key, val], idx) => (
-                    <Radio key={idx} value={key}>
-                      {val.tag}
+                {Object.entries(itemList)?.map(
+                  ([, { list_item_id, list_item_name }], idx) => (
+                    <Radio key={idx} value={list_item_id}>
+                      {list_item_name}
                     </Radio>
                   )
                 )}
@@ -483,25 +477,44 @@ const Report = () => {
             </div>
           </Form.Item>
         )}
-        {problemSelectedValue && (
+        {listItemSelectedValue && (
           <Form.Item
             name="detail"
             className="_5m1e__report__form__detail _5m1e__report__form__detail__wrapper"
             label={t("report.detail.label")}
             required
           >
-            <Checkbox.Group>
-              {detailList.map((detail, idx) => (
-                <Checkbox
-                  key={idx}
-                  value={detail}
-                  defaultChecked={false}
-                  checked={detailSelectedValues.includes(detail)}
-                  onChange={(e) => onDetailChange(e)}
-                >
-                  {detail}
-                </Checkbox>
-              ))}
+            <Checkbox.Group value={detailSelectedValues}>
+              {detailList &&
+                Object.entries(detailList).map(([, { item_detail }], idx) => (
+                  <Checkbox
+                    key={idx}
+                    value={item_detail}
+                    defaultChecked={false}
+                    checked={detailSelectedValues.includes(item_detail)}
+                    onChange={(e) => onDetailChange(e)}
+                  >
+                    {item_detail}
+                  </Checkbox>
+                ))}
+              <Checkbox
+                value={"other"}
+                defaultChecked={false}
+                checked={detailSelectedValues.includes("other")}
+                onChange={(e) => onDetailChange(e)}
+                className="detail__other"
+              >
+                <div className="detail__other__inner">
+                  Other
+                  {detailSelectedValues.includes("other") && (
+                    <Input
+                      id="detail-input"
+                      placeholder="detail ..."
+                      required
+                    />
+                  )}
+                </div>
+              </Checkbox>
             </Checkbox.Group>
           </Form.Item>
         )}
@@ -517,12 +530,15 @@ const Report = () => {
                 dropdownClassName="dropdown"
                 placeholder="..."
                 onChange={onProductChange}
+                value={productId}
               >
-                {products.map((product, idx) => (
-                  <Option value={product} key={idx}>
-                    {product}
-                  </Option>
-                ))}
+                {Object.entries(products).map(
+                  ([id, { full_name, short_name }], idx) => (
+                    <Option value={id} key={idx}>
+                      {`${short_name} : ${full_name}`}
+                    </Option>
+                  )
+                )}
               </Select>
             </Form.Item>
             <Form.Item
@@ -537,11 +553,16 @@ const Report = () => {
                 onChange={onLineChange}
               >
                 {lineList &&
-                  Object.entries(lineList).map(([id, detail], idx) => (
-                    <Option value={id} key={idx}>
-                      {detail.code} : {detail.name}
-                    </Option>
-                  ))}
+                  Object.entries(lineList).map(
+                    (
+                      [id, { section_id, line_name, work_center_code }],
+                      idx
+                    ) => (
+                      <Option value={id} key={idx}>
+                        {`${section_id} [${work_center_code}] : ${line_name}`}
+                      </Option>
+                    )
+                  )}
               </Select>
             </Form.Item>
             <Form.Item
@@ -554,12 +575,14 @@ const Report = () => {
                 placeholder="..."
                 onChange={onProcessChange}
               >
-                {lineList &&
-                  processList.map((detail, idx) => (
-                    <Option value={detail} key={idx}>
-                      {detail}
-                    </Option>
-                  ))}
+                {processList &&
+                  Object.entries(processList).map(
+                    ([id, { process_name }], idx) => (
+                      <Option value={id} key={idx}>
+                        {process_name}
+                      </Option>
+                    )
+                  )}
               </Select>
             </Form.Item>
             <Form.Item
@@ -572,12 +595,14 @@ const Report = () => {
                 placeholder="..."
                 onChange={onMachineChange}
               >
-                {lineList &&
-                  machineList.map((detail, idx) => (
-                    <Option value={detail} key={idx}>
-                      {detail}
-                    </Option>
-                  ))}
+                {machineList &&
+                  Object.entries(machineList).map(
+                    ([no, { machine_name }], idx) => (
+                      <Option value={no} key={idx}>
+                        {machine_name}
+                      </Option>
+                    )
+                  )}
               </Select>
             </Form.Item>
             <Form.Item
@@ -591,9 +616,9 @@ const Report = () => {
                 onChange={onPartChange}
               >
                 {partList &&
-                  Object.entries(partList).map(([id, detail], idx) => (
-                    <Option value={detail.name} key={idx}>
-                      {detail.no} : {detail.name}
+                  Object.entries(partList).map(([no, { part_name }], idx) => (
+                    <Option value={no} key={idx}>
+                      {no} : {part_name}
                     </Option>
                   ))}
               </Select>
@@ -613,6 +638,7 @@ const Report = () => {
                 beforeUpload={beforeUpload}
                 onPreview={showPreview}
                 onChange={onUploadChange}
+                disabled
               >
                 {fileList.length >= 5 ? null : uploadButton}
               </Upload>
@@ -637,16 +663,22 @@ const Report = () => {
         <Form.Item className="_5m1e__report__form__button">
           <div className="button-wrapper">
             <Button type="primary" htmlType="reset" danger>
-              Cancel
+              Reset
             </Button>
-            <Button type="primary" htmlType="button" onClick={() => onSave()}>
+            {/* <Button
+              type="primary"
+              htmlType="button"
+              onClick={() => onSave()}
+              disabled
+            >
               Save
-            </Button>
+            </Button> */}
             <Button
               type="primary"
               htmlType="submit"
               style={{ backgroundColor: "#34D76D" }}
               disabled={!inputCompleted}
+              loading={submitting}
             >
               Submit
             </Button>
@@ -670,9 +702,17 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   if (locale) {
     loc = locale;
   }
+
+  const data = await fetch(
+    `${process.env.BASE_URL_FRONTEND}/api/5m1e/static/report`,
+    { method: "GET" }
+  );
+  const resp: ReportPropsTypes = await data.json();
+
   return {
     props: {
       ...(await serverSideTranslations(loc, ["5m1e"])),
+      ...resp,
     },
   };
 };

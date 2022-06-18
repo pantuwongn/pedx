@@ -1,7 +1,7 @@
 import React, { useEffect, useState, FC } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation, TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
 import {
@@ -20,54 +20,72 @@ import {
   Popconfirm,
 } from "antd";
 import type { ColumnsType, TableProps } from "antd/lib/table";
-import { randomIntInRange } from "@/functions/common";
 import type { FilterValue, SorterResult } from "antd/lib/table/interface";
-import { RequestApprovalType } from "@/types/5m1e";
+import { fetcher } from "@/functions/fetch";
+import type { RequestDashboardType,SupporterDataType,TableDataType } from "@/types/5m1e";
+import type {
+  DepartmentType,
+  SectionType,
+  LineType,
+  LineUserType,
+  MachineType,
+  SCSymbolType,
+  ProcessJoinTypeType,
+  ProcessSymbolType,
+  ModelType,
+  ModelPartType,
+  RequestProcessType,
+  StateJoinTypeType,
+  ActionJoinTypeType,
+  UserJoinRolePositionType,
+  PartType,
+  ProductType,
+  SCSymbolDataType,
+  UserJoinRolePositionDataType,
+  GroupMemberType,
+  GroupType,
+  CustomerJoinPlantType,
+  TransitionJoinTransitionActionType,
+} from "@/types/static";
 import useUser from "@/lib/useUser";
 
 const { Option } = Select;
 const { Panel } = Collapse;
 const { Step } = Steps;
 
-interface DataType {
-  key: React.Key;
-  id: number;
-  type: string;
-  product: string;
-  line: string;
-  process: string;
-  part: string;
-  section: number;
-  category: string;
-  problem: string;
-  detail: string;
-  note?: string;
-  informer: string;
-  manager: string;
-  supporter: Array<string>;
-  action: Array<string>;
-  status: string;
-  created_date: string;
-  updated_date: string;
-}
+type DashboardPropsTypes = {
+  users_join_roles_positions: UserJoinRolePositionType;
+  groups: GroupType;
+  group_members: GroupMemberType;
+  departments: DepartmentType;
+  sections: SectionType;
+  lines: LineType;
+  lines_users: LineUserType;
+  machines: MachineType;
+  processes_join_types: ProcessJoinTypeType;
+  sc_symbols: SCSymbolType;
+  processes_symbol: ProcessSymbolType;
+  products: ProductType;
+  parts: PartType;
+  models: ModelType;
+  models_parts: ModelPartType;
+  customers_join_plants: CustomerJoinPlantType;
+  request_processes: RequestProcessType;
+  states_join_types: StateJoinTypeType;
+  actions_join_types: ActionJoinTypeType;
+  transitions_join_transitions_actions: TransitionJoinTransitionActionType;
+};
 
-interface StatusType {
-  text: string;
-  fontColor: string;
-}
+type TablePaginationPosition =
+  | "topLeft"
+  | "topCenter"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomCenter"
+  | "bottomRight";
 
-const products = ["STA", "ALT", "ECC", "PART"];
-const cats = [
-  "Man",
-  "Machine",
-  "Method",
-  "Material",
-  "Measurement",
-  "Environment",
-];
-const names = ["Lorem", "Ipsum", "Doror", "Sit", "Amet", "Consectetur"];
 const sups = ["PE", "QA", "SAFETY", "DESIGN", "FAC"];
-const supsColor: { [key: string]: string } = {
+const supporterColor: { [key: string]: string } = {
   PE: "purple",
   QA: "cyan",
   SAFETY: "green",
@@ -75,116 +93,46 @@ const supsColor: { [key: string]: string } = {
   FAC: "magenta",
 };
 
-const statusList: { [id: string]: StatusType } = {
-  "1": { text: "During check by TL", fontColor: "#2F8F9D" },
-  "2": {
-    text: "During approve by MGR",
-    fontColor: "#242F9B",
-  },
-  "3": {
-    text: "During action by TL/LL",
-    fontColor: "#FAC213",
-  },
-  "4": {
-    text: "During action by supporter",
-    fontColor: "#9EB23B",
-  },
-  "5": {
-    text: "During approve Change point",
-    fontColor: "#F38BA0",
-  },
-  "6": { text: "Completed/Resolved", fontColor: "#14C38E" },
-  "7": { text: "Cancelled", fontColor: "#F33737" },
-};
-
-const data: DataType[] = [];
-for (let i = 1; i < 50; i++) {
-  let prod = products[randomIntInRange(0, 3)];
-  let cat = cats[randomIntInRange(4, 0)];
-  let supAmount = randomIntInRange(5, 1);
-  let sups_ = [...sups];
-  let sup = [];
-  for (let i = 1; i <= supAmount; i++) {
-    const index = randomIntInRange(sups_.length - 1, 0);
-    sup.push(sups_[index]);
-    sups_.splice(index, 1);
-  }
-  sup.sort((a, b) => ("" + a).localeCompare(b));
-  data.push({
-    key: i,
-    id: i,
-    type: `${randomIntInRange(20, 1) % 2 ? "Problem" : "Change Point"}`,
-    product: prod,
-    line: `${prod} line-${randomIntInRange(10, 1)}`,
-    process: `${prod} proc-${randomIntInRange(20, 1)}`,
-    part: `${prod} part-${randomIntInRange(20, 1)}`,
-    section: 411234,
-    category: `${cat}`,
-    problem: `${cat} problem-${randomIntInRange(5, 1)}`,
-    detail: `${cat} detail-${randomIntInRange(5, 1)}`,
-    note: `ABCDEF`,
-    informer: `${names[randomIntInRange(5, 0)]}`,
-    manager: `Mgr. ${names[randomIntInRange(5, 0)]}`,
-    supporter: sup,
-    action: ["Request", "Show", "Update"],
-    status: `${randomIntInRange(7, 1).toString()}`,
-    created_date: `${new Date(
-      2022,
-      4,
-      i,
-      randomIntInRange(24, 0),
-      randomIntInRange(59, 0)
-    ).toLocaleString("ja-JP", {
-      hour12: false,
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`,
-    updated_date: `${new Date(
-      2022,
-      4,
-      i + randomIntInRange(6, 0),
-      randomIntInRange(24, 0),
-      randomIntInRange(59, 0)
-    ).toLocaleString("ja-JP", {
-      hour12: false,
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`,
-  });
-}
-
-const Dashboard = () => {
+const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
   const { user } = useUser({
     redirectTo: "/user/login",
   });
-
-  if (!user || user.isLoggedIn === false) {
-    return (
-      <div className="_5m1e center-main">
-        <p>Not logged in yet, please log in before use this page.</p>
-      </div>
-    );
-  }
-
+  const {
+    users_join_roles_positions,
+    groups,
+    group_members,
+    departments,
+    sections,
+    lines,
+    lines_users,
+    machines,
+    processes_join_types,
+    sc_symbols,
+    processes_symbol,
+    products,
+    parts,
+    models,
+    models_parts,
+    customers_join_plants,
+    request_processes,
+    states_join_types,
+    actions_join_types,
+    transitions_join_transitions_actions,
+  }: DashboardPropsTypes = props;
   const { t } = useTranslation("5m1e");
   const router = useRouter();
   const pathQuery = router.query;
   var socket: Socket;
   const [form] = Form.useForm();
+  const [tableData, setTableData] = useState<TableDataType[]>();
+  const [tableType, setTableType] = useState<string>("problem");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filteredInfo, setFilteredInfo] = useState<
     Record<string, FilterValue | null>
   >({});
-  const [sortedInfo, setSortedInfo] = useState<SorterResult<DataType>>({});
+  const [sortedInfo, setSortedInfo] = useState<SorterResult<TableDataType>>({});
 
-  const [tableType, setTableType] = useState<string>("problem");
-
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<TableDataType> = [
     {
       key: "created",
       title: "Created",
@@ -244,7 +192,6 @@ const Dashboard = () => {
       key: "product",
       title: "Product",
       dataIndex: "product",
-      fixed: "left",
       width: 115,
       filters: [
         { text: "STA", value: "STA" },
@@ -335,7 +282,7 @@ const Dashboard = () => {
       render: (_, { supporter }) => (
         <div className="table-column__supporter">
           {supporter.map((sup) => (
-            <Tag color={supsColor[sup]} key={sup}>
+            <Tag color={supporterColor[sup]} key={sup}>
               {sup}
             </Tag>
           ))}
@@ -371,10 +318,17 @@ const Dashboard = () => {
   useEffect(() => {
     // initialize socket connection
     socketInitialize();
+
+    async function InitialLoadAllRequestsData() {
+      setIsLoading(true);
+      await loadAllRequestData();
+      setIsLoading(false);
+    }
+    InitialLoadAllRequestsData();
   }, []);
 
   useEffect(() => {
-    const { t, c, p, l, pb, i, m } = pathQuery;
+    const { t, c, p, l, li, i, m } = pathQuery;
     if (typeof t === "string") {
       setTableType(t);
     }
@@ -383,7 +337,7 @@ const Dashboard = () => {
       category: c,
       part: p,
       line: l,
-      problem: pb,
+      list: li,
       informer: i,
       manager: m,
     };
@@ -416,18 +370,155 @@ const Dashboard = () => {
     // });
   }
 
-  const onTableChange: TableProps<DataType>["onChange"] = (
+  const loadAllRequestData = async () => {
+    function get_sc_symbols(process_id: string): SCSymbolDataType[] {
+      return processes_symbol[process_id].map(
+        ({ sc_symbol_id }) => sc_symbols[sc_symbol_id.toString()]
+      );
+    }
+
+    const body = {
+      t: "1,2",
+      t_name: "5M1E",
+      access_token: user?.access_token,
+    };
+    const data: RequestDashboardType = await fetcher(
+      "/api/5m1e/dashboard/getallrequests",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    // rearrange for table data format
+    const rearrangedData: TableDataType[] = Object.entries(data).map(
+      (
+        [
+          request_id,
+          {
+            is_locked,
+            request_process_id,
+            line_id,
+            current_state_id,
+            request_data_id,
+            request_data_value: {
+              category,
+              list,
+              detail,
+              product_id,
+              process_id,
+              machine_no,
+              part_no,
+              note,
+            },
+            req_created_at,
+            req_updated_at,
+            req_user_uuid,
+            data_created_at,
+            data_updated_at,
+            request_no,
+            actions,
+            files,
+            concerneds,
+          },
+        ],
+        idx
+      ) => {
+        let tl: UserJoinRolePositionDataType[] = [];
+        let mgr: UserJoinRolePositionDataType[] = [];
+        let fm: UserJoinRolePositionDataType[] = [];
+        lines_users[line_id].forEach(({ user_uuid }) => {
+          if (users_join_roles_positions[user_uuid].position_name === "TL") {
+            tl.push(users_join_roles_positions[user_uuid]);
+          } else if (
+            users_join_roles_positions[user_uuid].position_name === "MGR"
+          ) {
+            mgr.push(users_join_roles_positions[user_uuid]);
+          } else if (
+            users_join_roles_positions[user_uuid].position_name === "FM"
+          ) {
+            fm.push(users_join_roles_positions[user_uuid]);
+          }
+        });
+        let modelData =
+          models[
+            Object.values(models_parts).filter(
+              ({ part_no: pno }) => pno === part_no
+            )[0].model_id
+          ];
+        return {
+          key: idx,
+          id: request_id,
+          type: request_processes[request_process_id].request_process_short_name,
+          request_id: request_id,
+          request_no: request_no,
+          is_locked: is_locked,
+          createdAt: req_created_at,
+          updatedAt: req_updated_at,
+          productName: products[product_id],
+          partNo: part_no,
+          partName: part_no !== "-" ? parts[part_no].part_name : "-",
+          processName:
+            process_id !== "-" ? processes_join_types[process_id] : "-",
+          scSymbol: process_id !== "-" ? get_sc_symbols(process_id) : "-",
+          mcNo: machines[machine_no],
+          deptName:
+            departments[sections[lines[line_id].section_id].department_id]
+              .department_name,
+          sectionCode: sections[lines[line_id].section_id].section_code,
+          lineName: lines[line_id],
+          requestDataId: request_data_id,
+          requestDataCreated: data_created_at,
+          requestDataUpdated: data_updated_at,
+          category: category,
+          listItem: list,
+          itemDetail: detail,
+          requestFile: files,
+          requestNote: note,
+          requesterName: users_join_roles_positions[req_user_uuid].firstname,
+          tlName: tl,
+          mgrName: mgr,
+          fmName: fm,
+          supporter: concerneds.map(({ concerned_user_uuid, group_id }) => ({
+            concerned_user_uuid: concerned_user_uuid,
+            group_id: group_id,
+            group_name: groups[group_id].group_name,
+            group_members: group_members[group_id],
+          } as SupporterDataType)) ,
+          requestStatus: states_join_types[current_state_id],
+          requestConcern: concerneds,
+          modelName: modelData,
+          customerName: customers_join_plants[modelData.customer_id],
+          actions: actions,
+          actionButton: Object.entries(
+            transitions_join_transitions_actions
+          ).reduce(
+            (acc, [id, data]) =>
+              data.current_state_id === current_state_id
+                ? { ...acc, [id]: data }
+                : {},
+            {} as TransitionJoinTransitionActionType
+          ),
+        };
+      }
+    );
+    setTableData(rearrangedData);
+  };
+
+  const onTableChange: TableProps<TableDataType>["onChange"] = (
     pagination,
     filters,
     sorter,
     extra
   ) => {
     setFilteredInfo(filters);
-    setSortedInfo(sorter as SorterResult<DataType>);
+    setSortedInfo(sorter as SorterResult<TableDataType>);
     // check current data source is zero
     // then increase margin for prevent overlap
     // with clear button
-    checkDataForTableMargin(extra.currentDataSource);
+    // checkDataForTableMargin(extra.currentDataSource);
   };
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
@@ -457,7 +548,7 @@ const Dashboard = () => {
   const clearFilters = () => {
     form.resetFields();
     setFilteredInfo({});
-    checkDataForTableMargin(data);
+    // checkDataForTableMargin(data);
   };
 
   const clearSorters = () => {
@@ -465,7 +556,7 @@ const Dashboard = () => {
     // checkDataForTableMargin(data)
   };
 
-  const checkDataForTableMargin = (data: DataType[]) => {
+  const checkDataForTableMargin = (data: TableDataType[]) => {
     let root: HTMLDivElement | null = document.querySelector(
       "._5m1e__dashboard__table-wrapper > .ant-table-wrapper"
     );
@@ -478,6 +569,14 @@ const Dashboard = () => {
       root.style.marginTop = "0";
     }
   };
+
+  if (!user || user.isLoggedIn === false) {
+    return (
+      <div className="_5m1e center-main">
+        <p>Not logged in yet, please log in before use this page.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="center-main _5m1e__dashboard">
@@ -572,8 +671,9 @@ const Dashboard = () => {
           columns={columns}
           dataSource={data}
           size="large"
+          loading={isLoading}
           pagination={{
-            position: ["topLeft", "bottomRight"],
+            position: ["none" as TablePaginationPosition, "bottomRight"],
             showSizeChanger: true,
             onShowSizeChange: onShowSizeChange,
             hideOnSinglePage: false,
@@ -589,7 +689,7 @@ const Dashboard = () => {
   );
 };
 
-const TableExpand: FC<{ record: DataType }> = ({ record }) => {
+const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
   const { t } = useTranslation("5m1e");
 
   return (
@@ -672,7 +772,7 @@ const TableExpand: FC<{ record: DataType }> = ({ record }) => {
         <span>{`Supporter`}</span>
         <div className="detail__supporter">
           {record.supporter.map((sup) => (
-            <Tag color={supsColor[sup]} key={sup}>
+            <Tag color={supporterColor[sup]} key={sup}>
               {sup}
             </Tag>
           ))}
@@ -765,9 +865,17 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   if (locale) {
     loc = locale;
   }
+
+  const data = await fetch(
+    `${process.env.BASE_URL_FRONTEND}/api/5m1e/static/dashboard`,
+    { method: "GET" }
+  );
+  const resp: DashboardPropsTypes = await data.json();
+
   return {
     props: {
       ...(await serverSideTranslations(loc, ["5m1e"])),
+      ...resp,
     },
   };
 };

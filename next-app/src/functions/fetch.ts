@@ -1,29 +1,19 @@
 import { message } from "antd";
 
-import fetchJson, {
-  fetchJsonByFetch,
-  FetchError,
-  FetchErrorByFetch,
-} from "@/lib/fetchJson";
-import { AxiosRequestConfig } from "axios";
+import { fetchJson, FetchError, FetchErrorByFetch } from "@/lib/fetchJson";
 
-export async function fetcher(
-  url: string,
-  options: Object = {},
-  byFetch: Boolean = false
-): Promise<any> {
+export async function fetcher(url: string, options: Object = {}): Promise<any> {
   try {
-    if (byFetch) {
-      const data = await fetchJsonByFetch(url, options);
-      return data;
-    }
-
-    let config: AxiosRequestConfig = {
-      url: url,
-      ...options,
-    };
-    const data = await fetchJson(config);
+    console.log('fetcher',url,options)
+    const data = await fetchJson(url, options);
     return data;
+
+    // let config: AxiosRequestConfig = {
+    //   url: url,
+    //   ...options,
+    // };
+    // const data = await fetchJson(config);
+    // return data;
   } catch (error) {
     if (error instanceof FetchError || error instanceof FetchErrorByFetch) {
       let msg: string | Array<string> = error.data.detail;
@@ -38,5 +28,6 @@ export async function fetcher(
     } else {
       message.error(`An unexpected error happened: ${error}`);
     }
+    return null
   }
 }

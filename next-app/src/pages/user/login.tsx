@@ -4,7 +4,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Form, Input, Button, message } from "antd";
 import useUser from "@/lib/useUser";
 import { fetcher } from "@/functions/fetch";
-import fetchJson, { FetchError } from "@/lib/fetchJson";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -22,18 +21,20 @@ const Login = () => {
       user_id: values.id,
       user_pass: values.password,
     };
+
     try {
+      let result = null
       await mutateUser(
-        await fetcher(
+        result = await fetcher(
           "/api/user/login",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
-          },
-          true
+          }
         )
       );
+      if (!result) return
       router.back();
     } catch {
       message.error("Login failed");

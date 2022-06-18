@@ -21,22 +21,21 @@ class Users(Base):
     email = Column(String, unique=True)
     app_line_id = Column(String)
     position_id = Column(Integer, ForeignKey("positions.position_id"))
-    section_code = Column(Integer, ForeignKey("sections.section_code"))
-    concern_section = Column(postgresql.ARRAY(Integer), default="{}")
+    section_id = Column(Integer, ForeignKey("sections.section_id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True))
+    is_active = Column(Boolean,default=False)
 
     role = relationship("Roles", back_populates="user")
     position = relationship("Positions", back_populates="user")
     section = relationship("Sections", back_populates="user")
+    line = relationship("Lines",secondary="lines_users",back_populates="user")
     request_process = relationship(
         "RequestProcesses", secondary="process_admin", back_populates="user"
     )
     request = relationship("Requests", back_populates="user")
     request_data = relationship("RequestDatas", back_populates="user")
-    request_note = relationship("RequestNotes", back_populates="user")
     request_file = relationship("RequestFiles", back_populates="user")
-    request_action_note = relationship("RequestActionNotes", back_populates="user")
     request_concern = relationship(
         "Requests", secondary="request_concerned", back_populates="user_concern"
     )

@@ -7,7 +7,7 @@ import "@/styles/app.scss";
 import store from "@/app/store";
 import { Provider } from "react-redux";
 import { SWRConfig } from "swr";
-import fetchJson from "@/lib/fetchJson";
+import {fetchJson} from "@/lib/fetchJson";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

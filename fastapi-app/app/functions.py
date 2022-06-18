@@ -1,5 +1,7 @@
 from typing import Any, List
 import asyncpg.pgproto.pgproto as pgproto
+from datetime import datetime, tzinfo
+import pytz
 
 
 def toArray(input: Any) -> list:
@@ -8,40 +10,51 @@ def toArray(input: Any) -> list:
     return rs
 
 
-def toArrayWithKey(
-    input: Any,
-    table: List[Any] | Any = [],
-    except_column: list[str] = [],
-    raw: bool = False,
-) -> list:
+def toArrayWithKey(input: Any, except_column: list[str] = []) -> list:
+    tz = pytz.timezone("Asia/Bangkok")
     # query with raw statement
-    if raw:
-        rs = [
-            {
-                c: str(getattr(r, c))
-                if isinstance(getattr(r, c), pgproto.UUID)
-                else getattr(r, c)
-                for c in r.keys()
-                if c not in except_column
-            }
-            for r in input
-        ]
-        return rs
-
-    # query with select
-    rs = input.scalars().all()
-    if isinstance(table, list):
-        columns = [c for t in table for c in t.__table__.columns.keys()]
-    else:
-        columns = table.__table__.columns.keys()
     rs = [
-        dict(
-            (c, str(getattr(r, c)))
+        {
+            c: str(getattr(r, c))
             if isinstance(getattr(r, c), pgproto.UUID)
-            else (c, getattr(r, c))
-            for c in columns
+            else getattr(r, c)
+            .replace(tzinfo=pytz.utc)
+            .astimezone(tz)
+            .strftime("%Y-%m-%d %H:%M:%S.%f")
+            if isinstance(getattr(r, c), datetime)
+            else getattr(r, c)
+            for c in r.keys()
             if c not in except_column
-        )
-        for r in rs
+        }
+        for r in input
     ]
     return rs
+
+
+def toDictByColumnId(input: list, id_column: str) -> dict:
+    output = {}
+    for e in input:  # each element in input list
+        if id_column not in e:
+            return
+        e_output = {}
+        for k, v in e.items():  # each key, value in element.items()
+            if k != id_column:
+                e_output = {**e_output, k: v}
+        output = {**output, e[id_column]: e_output}
+    return output
+
+
+def toDictArrayByColumnId(input: list, id_column: str) -> dict:
+    output = {}
+    for e in input:
+        if id_column not in e:
+            return
+        e_output = {}
+        for k, v in e.items():
+            if k != id_column:
+                e_output = {**e_output, k: v}
+        if e[id_column] in output:
+            output = {**output, e[id_column]: [*output[e[id_column]], e_output]}
+        else:
+            output = {**output, e[id_column]: [e_output]}
+    return output

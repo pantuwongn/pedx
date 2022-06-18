@@ -25,13 +25,13 @@ lifetime_refresh = config["LIFETIME_REFRESH"]  # days
 
 
 class BearerResponse(BaseModel):
-    uuid: str
+    user_uuid: str
     user_id: str
     firstname: str
     lastname: str
     email: str
     position_id: int
-    section_code: int
+    section_id: int
     concern_section: List[int]
     
     is_admin: bool

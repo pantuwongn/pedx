@@ -1,6 +1,4 @@
-from pyexpat import model
 from sqlalchemy import (
-    ARRAY,
     Column,
     String,
     Integer,
@@ -15,12 +13,26 @@ from sqlalchemy.sql import func
 
 from app.database import Base
 
+class Groups(Base):
+    __tablename__ = "groups"
+    
+    group_id = Column(Integer,Sequence("groups_group_id_seq"),primary_key=True)
+    group_name = Column(String,nullable=False,unique=True)
+
+class GroupMembers(Base):
+    __tablename__ = "group_members"
+    
+    id = Column(Integer,Sequence("group_members_id_seq"),primary_key=True)
+    group_id = Column(Integer,ForeignKey("groups.group_id"))
+    user_uuid = Column(postgresql.UUID(as_uuid=True),ForeignKey("users.user_uuid"))
+    
 
 class Sections(Base):
     __tablename__ = "sections"
 
-    section_code = Column(Integer, primary_key=True)
-    section_name = Column(String, nullable=False, unique=True)
+    section_id = Column(Integer, Sequence("sections_section_id_seq"), primary_key=True)
+    section_code = Column(Integer, nullable=False)
+    section_name = Column(String, nullable=False)
     department_id = Column(Integer, ForeignKey("departments.department_id"))
 
     department = relationship("Departments", back_populates="section")
@@ -45,11 +57,27 @@ class Lines(Base):
     line_id = Column(Integer, Sequence("lines_line_id_seq"), primary_key=True)
     line_name = Column(String, nullable=False)
     work_center_code = Column(String, nullable=False)
-    section_code = Column(Integer, ForeignKey("sections.section_code"))
+    section_id = Column(Integer, ForeignKey("sections.section_id"))
 
+    user = relationship("Users", secondary="lines_users", back_populates="line")
     section = relationship("Sections", back_populates="line")
     part = relationship("Parts", secondary="lines_parts", back_populates="line")
     request = relationship("Requests", back_populates="line")
+
+
+class Machines(Base):
+    __tablename__ = "machines"
+
+    machine_no = Column(String, Sequence("machines_machine_id_seq"), primary_key=True)
+    machine_name = Column(String, nullable=False)
+    machine_type = Column(String, nullable=False)
+    machine_maker = Column(String, nullable=False)
+    machine_model = Column(String, default="")
+
+    process = relationship(
+        "Processes", secondary="processes_machines", back_populates="machine"
+    )
+    part = relationship("Parts", secondary="parts_machines", back_populates="machine")
 
 
 class Processes(Base):
@@ -60,8 +88,11 @@ class Processes(Base):
     process_type_id = Column(Integer, ForeignKey("process_types.process_type_id"))
     line_id = Column(Integer, ForeignKey("lines.line_id"))
 
+    machine = relationship(
+        "Machines", secondary="processes_machines", back_populates="process"
+    )
     symbol = relationship(
-        "SCSymbols", secondary="process_symbol", back_populates="process"
+        "SCSymbols", secondary="processes_symbols", back_populates="process"
     )
 
 
@@ -80,11 +111,17 @@ class SCSymbols(Base):
     sc_symbol_id = Column(
         Integer, Sequence("sc_symbols_sc_symbol_id_seq"), primary_key=True
     )
-    character = Column(String(2), nullable=False)
-    shape = Column(postgresql.ENUM("circle", "square", "triangle",name="shape_enum"), nullable=False)
+    character = Column(String(10), nullable=False)
+    shape = Column(
+        postgresql.ENUM(
+            "circle", "diamond", "triangle", "None", name="sc_symbols_shape_enum"
+        ),
+        nullable=False,
+    )
+    remark = Column(String, server_default="")
 
     process = relationship(
-        "Processes", secondary="process_symbol", back_populates="symbol"
+        "Processes", secondary="processes_symbols", back_populates="symbol"
     )
 
 
@@ -101,12 +138,15 @@ class Products(Base):
 class Models(Base):
     __tablename__ = "models"
 
-    model_code = Column(String, primary_key=True)
+    model_id = Column(Integer, Sequence("model_model_id_seq"), primary_key=True)
+    model_code = Column(String, nullable=False)
     model_name = Column(String, default="")
     customer_id = Column(Integer, ForeignKey("customers.customer_id"))
 
     part = relationship("Parts", secondary="models_parts", back_populates="model")
-    customer = relationship("Customers", back_populates="model")
+    customer = relationship(
+        "Customers", secondary="models_customers", back_populates="model"
+    )
 
 
 class Customers(Base):
@@ -118,7 +158,9 @@ class Customers(Base):
     customer_name = Column(String, nullable=False, unique=True)
     customer_short_name = Column(String, default="")
 
-    model = relationship("Models", back_populates="customer")
+    model = relationship(
+        "Models", secondary="models_customers", back_populates="customer"
+    )
     customer_plant = relationship("CustomerPlants", back_populates="customer")
 
 
@@ -141,10 +183,13 @@ class Parts(Base):
     part_name = Column(String, nullable=False)
     product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True))
 
     product = relationship("Products", back_populates="part")
     line = relationship("Lines", secondary="lines_parts", back_populates="part")
+    machine = relationship(
+        "Machines", secondary="parts_machines", back_populates="part"
+    )
     model = relationship("Models", secondary="models_parts", back_populates="part")
     main_part_no = relationship("SubParts", back_populates="part_no_main")
     sub_part_no = relationship("SubParts", back_populates="part_no_sub")
@@ -168,6 +213,7 @@ class RequestProcesses(Base):
         Integer, Sequence("request_processes_request_process_id_seq"), primary_key=True
     )
     request_process_name = Column(String, nullable=False, unique=True)
+    request_process_short_name = Column(String,nullable=False)
 
     user = relationship(
         "Users", secondary="process_admin", back_populates="request_process"
@@ -185,7 +231,7 @@ class StateTypes(Base):
     state_type_id = Column(
         Integer, Sequence("state_types_state_type_id_seq"), primary_key=True
     )
-    state_name = Column(String, nullable=False)
+    state_type_name = Column(String, nullable=False)
 
     state = relationship("States", back_populates="state_type")
 
@@ -222,6 +268,7 @@ class Transitions(Base):
     request_process_id = Column(
         Integer, ForeignKey("request_processes.request_process_id"), nullable=False
     )
+    description = Column(String,default="")
 
     state_current = relationship("States", back_populates="current_state")
     state_next = relationship("States", back_populates="next_state")
@@ -252,8 +299,6 @@ class Actions(Base):
     action_id = Column(Integer, Sequence("actions_action_id_seq"), primary_key=True)
     action_name = Column(String, nullable=False)
     action_description = Column(String, default="")
-    set_active = Column(Boolean, default=False)
-    set_complete = Column(Boolean, default=True)
     action_type_id = Column(Integer, ForeignKey("action_types.action_type_id"))
     request_process_id = Column(
         Integer, ForeignKey("request_processes.request_process_id")
@@ -264,7 +309,6 @@ class Actions(Base):
     transition = relationship(
         "Transitions", secondary="transitions_actions", back_populates="action"
     )
-    action_target = relationship("ActionTargets", back_populates="action")
     request_action = relationship("RequestActions", back_populates="action")
 
 
@@ -300,18 +344,6 @@ class Activities(Base):
     transition = relationship(
         "Transitions", secondary="transitions_activities", back_populates="activity"
     )
-    activity_target = relationship("ActivityTargets", back_populates="activity")
-
-
-class Targets(Base):
-    __tablename__ = "targets"
-
-    target_id = Column(Integer, Sequence("targets_target_id_seq"), primary_key=True)
-    target_name = Column(String, nullable=False)
-    target_description = Column(String, default="")
-
-    action_target = relationship("ActionTargets", back_populates="target")
-    activity_target = relationship("ActivityTargets", back_populates="target")
 
 
 class ListItems(Base):
@@ -320,6 +352,10 @@ class ListItems(Base):
     list_item_id = Column(
         Integer, Sequence("list_items_list_item_id_seq"), primary_key=True
     )
+    request_process_id = Column(
+        Integer, ForeignKey("request_processes.request_process_id")
+    )
+    category = Column(String, nullable=False)
     list_item_name = Column(String, nullable=False)
 
     item_detail = relationship("ItemDetails", back_populates="list_item")
@@ -346,16 +382,48 @@ class LinesParts(Base):
     part_no = Column(String, ForeignKey("parts.part_no"))
 
 
+class LinesUsers(Base):
+    __tablename__ = "lines_users"
+
+    id = Column(Integer, Sequence("lines_users_iq_seq"), primary_key=True)
+    line_id = Column(Integer, ForeignKey("lines.line_id"))
+    user_uuid = Column(postgresql.UUID(as_uuid=True), ForeignKey("users.user_uuid"))
+
+
 class ModelsParts(Base):
     __tablename__ = "models_parts"
 
     id = Column(Integer, Sequence("models_parts_id_seq"), primary_key=True)
-    model = Column(String, ForeignKey("models.model_code"))
+    model_id = Column(Integer, ForeignKey("models.model_id"))
     part_no = Column(String, ForeignKey("parts.part_no"))
 
 
+class ModelsCustomers(Base):
+    __tablename__ = "models_customers"
+
+    id = Column(Integer, Sequence("models_customers_id_seq"), primary_key=True)
+    model_id = Column(Integer, ForeignKey("models.model_id"))
+    customer_id = Column(Integer, ForeignKey("customers.customer_id"))
+
+
+class PartsMachines(Base):
+    __tablename__ = "parts_machines"
+
+    id = Column(Integer, Sequence("parts_machines_id_seq"), primary_key=True)
+    part_no = Column(String, ForeignKey("parts.part_no"))
+    machine_no = Column(String, ForeignKey("machines.machine_no"))
+
+
+class ProcessesMachines(Base):
+    __tablename__ = "processes_machines"
+
+    id = Column(Integer, Sequence("processes_machines_id_seq"), primary_key=True)
+    process_id = Column(Integer, ForeignKey("processes.process_id"))
+    machine_no = Column(String, ForeignKey("machines.machine_no"))
+
+
 class ProcessSymbol(Base):
-    __tablename__ = "process_symbol"
+    __tablename__ = "processes_symbols"
 
     id = Column(Integer, Sequence("process_symbol_id_seq"), primary_key=True)
     process_id = Column(Integer, ForeignKey("processes.process_id"))
@@ -378,6 +446,7 @@ class TransitionsActions(Base):
     id = Column(Integer, Sequence("transitions_actions_id_seq"), primary_key=True)
     transition_id = Column(Integer, ForeignKey("transitions.transition_id"))
     action_id = Column(Integer, ForeignKey("actions.action_id"))
+    description = Column(String,default="")
 
 
 class StatesActivities(Base):
@@ -386,6 +455,7 @@ class StatesActivities(Base):
     id = Column(Integer, Sequence("states_activities_id_seq"), primary_key=True)
     state_id = Column(Integer, ForeignKey("states.state_id"))
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
+    description = Column(String,default="")
 
 
 class TransitionsActivities(Base):
@@ -394,3 +464,4 @@ class TransitionsActivities(Base):
     id = Column(Integer, Sequence("transitions_activities_id_seq"), primary_key=True)
     transition_id = Column(Integer, ForeignKey("transitions.transition_id"))
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
+    description = Column(String,default="")
