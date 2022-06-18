@@ -21,6 +21,8 @@ First, define environment variable value for service
 ```bash
 # Secret key for encrypt and decrypt cookie for 'swr'
 SECRET_COOKIE_PASSWORD = ...
+# Base url of frontend (for fetch api route of Next.js)
+BASE_URL_FRONTEND = http://x.x.x.x:xxxx
 # URL address of backend server
 BASE_URL_BACKEND = http://127.0.0.1:8000
 ```
