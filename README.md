@@ -32,6 +32,18 @@ BASE_URL_BACKEND = http://127.0.0.1:8000
 # email for use as sender notification
 EMAIL_ADDRESS = "...@gmail.com"
 EMAIL_PASS = "..."
+# database parameter for MSSQL
+MSSQL_USER = "sa"
+MSSQL_PASS = "maewnarm"
+MSSQL_SERVER = "DESKTOP-8N46EGS\SQLEXPRESS"
+MSSQL_PORT = "1433"
+MSSQL_DB = "testdb"
+# database parameter for PostgreSQL
+PG_USER = "postgres"
+PG_PASS = "postgres"
+PG_SERVER = "localhost"
+PG_PORT = "5432"
+PG_DB = "pe-1"
 # JWK secret key for encrypt and decrypt JWE token
 # generate by python
 # >>> from jwcrypto import jwk
