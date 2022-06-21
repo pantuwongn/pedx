@@ -4,9 +4,8 @@ export async function fetchJson<JSON = unknown>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<JSON> {
-  console.log('fetchJson',input,init)
   const response = await fetch(input, init);
-  console.log(response)
+
   const data = await response.json();
 
   if (response.ok) {

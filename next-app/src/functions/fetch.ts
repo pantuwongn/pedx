@@ -4,7 +4,7 @@ import { fetchJson, FetchError, FetchErrorByFetch } from "@/lib/fetchJson";
 
 export async function fetcher(url: string, options: Object = {}): Promise<any> {
   try {
-    console.log('fetcher',url,options)
+    // console.log('fetcher',url,options)
     const data = await fetchJson(url, options);
     return data;
 

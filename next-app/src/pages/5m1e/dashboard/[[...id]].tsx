@@ -1043,7 +1043,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
     fallback: true,

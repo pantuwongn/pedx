@@ -26,12 +26,12 @@ const _5M1E = () => {
               <b>D</b>ashboard
             </p>
           </Link>
-          <Link href="/5m1e/report?t=problem">
+          <Link href="/5m1e/report/problem">
             <p>
               <b>R</b>eport - <b>P</b>roblem
             </p>
           </Link>
-          <Link href="/5m1e/report?t=changepoint">
+          <Link href="/5m1e/report/changepoint">
             <p>
               <b>R</b>eport - <b>C</b>hange <b>P</b>oint
             </p>

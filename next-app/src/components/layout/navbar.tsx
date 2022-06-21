@@ -48,7 +48,7 @@ const User = () => {
   );
 };
 
-const LogoLink = React.forwardRef(({ onClick, href }, ref) => {
+const LogoLink = React.forwardRef(function forwardRef({ onClick, href }, ref) {
   return (
     <a href={href} onClick={onClick} ref={ref}>
       <abbr title="Home">

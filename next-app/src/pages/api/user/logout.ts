@@ -16,7 +16,10 @@ function logoutRoute(req: NextApiRequest, res: NextApiResponse<User>) {
     email: "",
     position_id: 0,
     section_id: 0,
-    concern_section: [],
+    concern_line: [],
+    created_at: "",
+    updated_at: "",
+    is_active: false,
     is_admin: false,
     is_viewer: false,
     is_recorder: false,
@@ -26,6 +29,5 @@ function logoutRoute(req: NextApiRequest, res: NextApiResponse<User>) {
     qar_editor: false,
     avatarUrl: "",
     access_token: "",
-    refresh_token: "",
   });
 }

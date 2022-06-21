@@ -1,4 +1,4 @@
-import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   Button,
@@ -53,7 +53,7 @@ const categories = [
 ];
 
 type ReportPropsTypes = {
-  request_processes: RequestProcessType
+  request_processes: RequestProcessType;
   list_items_problem: ListItemType;
   list_items_changepoint: ListItemType;
   item_details: ItemDetailType;
@@ -94,8 +94,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
 
   const { t } = useTranslation("5m1e");
   const router = useRouter();
-  const pathQuery = router.query;
-  const { t: path_t = "problem" } = pathQuery;
+  const { type: path_t } = router.query;
   const [form] = Form.useForm();
   const [itemList, setItemList] = useState<ListItemDataType[]>([]);
   const [detailList, setDetailList] = useState<ItemDetailType>();
@@ -133,8 +132,8 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
   );
 
   useEffect(() => {
-    console.log(pathQuery);
-  }, [pathQuery]);
+    console.log(path_t);
+  }, [path_t]);
 
   useEffect(() => {
     if (!path_t) return;
@@ -319,12 +318,12 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
           }`
         : detail
     );
-    const request_process_id = path_t ==='problem' ? 1 : 2
+    const request_process_id = path_t === "problem" ? 1 : 2;
     return {
       request_process_id: request_process_id,
-      request_process_name: request_processes[request_process_id].request_process_short_name,
-      state_id: path_t ==='problem' ? 1 : 2,
-      // TODO state_id for changepoint
+      request_process_name:
+        request_processes[request_process_id].request_process_short_name,
+      state_id: path_t === "problem" ? 1 : 9,
       category: values.category,
       list: values.list,
       detail: detailValue,
@@ -427,7 +426,10 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
 
   return (
     <div className="_5m1e__report center-main">
-      <h3>5M1E Report system - Report {pathQuery.t}</h3>
+      <h3>
+        5M1E Report system - Report{" "}
+        {path_t === "problem" ? "Problem" : "Change point"}
+      </h3>
       <Form
         className="_5m1e__report__form"
         form={form}
@@ -714,6 +716,13 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
       ...(await serverSideTranslations(loc, ["5m1e"])),
       ...resp,
     },
+  };
+};
+
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  return {
+    paths: [],
+    fallback: true,
   };
 };
 
