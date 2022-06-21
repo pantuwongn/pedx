@@ -24,7 +24,7 @@ def request_routers(db: AsyncGenerator) -> APIRouter:
         return "save"
 
     @router.get(
-        "/get/allrequest", dependencies=[Depends(BearerDependency(auto_error=False))]
+        "/get/allrequests", dependencies=[Depends(BearerDependency(auto_error=False))]
     )
     async def get_all_requests_by_type(t: str,t_name:str, db: AsyncSession = Depends(db)):
         ids = list(map(int, t.split(",")))

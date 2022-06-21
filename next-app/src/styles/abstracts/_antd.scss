@@ -42,8 +42,10 @@
       background-color: var(--bg-color-light) !important;
       &-item {
         color: var(--font-color);
-        &-active,&-selected {
-          color:var(--font-color-contrast)
+        &-active,
+        &-selected {
+          background-color: var(--bg-color-contrast);
+          color: var(--font-color-contrast);
         }
       }
     }

@@ -92,12 +92,15 @@ export type TableDataType = {
   productName: ProductDataType
   partNo:string
   partName:string
-  processName: string | ProcessJoinTypeDataType
+  modelId: number | undefined
+  modelData: ModelDataType | undefined
+  process: string | ProcessJoinTypeDataType
   scSymbol:string|SCSymbolDataType[]
-  mcNo: MachineDataType
+  mcNo: string
+  mcData: MachineDataType
   deptName: string
   sectionCode: number
-  lineName: LineDataType
+  line: LineDataType
   requestDataId: number
   requestDataCreated: string
   requestDataUpdated: string
@@ -107,14 +110,13 @@ export type TableDataType = {
   requestFile: RequestFileDataType[]
   requestNote: string
   requesterName: string
-  tlName: UserJoinRolePositionDataType[]
-  mgrName: UserJoinRolePositionDataType[]
-  fmName: UserJoinRolePositionDataType[]
+  tl: UserJoinRolePositionDataType[]
+  mgr: UserJoinRolePositionDataType[]
+  fm: UserJoinRolePositionDataType[]
   supporter: SupporterDataType[]
   requestStatus:StateDataType & StateTypeDataType
   requestConcern: RequestConcernedDataType[]
-  modelName: ModelDataType
-  customerName: CustomerJoinPlantDataType
+  customers: CustomerJoinPlantDataType[] | undefined
   actions:RequestActionDataType[]
   actionButton:TransitionJoinTransitionActionType
 }

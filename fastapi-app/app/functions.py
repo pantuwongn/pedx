@@ -44,17 +44,28 @@ def toDictByColumnId(input: list, id_column: str) -> dict:
     return output
 
 
-def toDictArrayByColumnId(input: list, id_column: str) -> dict:
+def toDictArrayByColumnId(
+    input: list, id_column: str, except_array_columns: list[str] = []
+) -> dict:
     output = {}
     for e in input:
         if id_column not in e:
             return
+        except_output = {}
         e_output = {}
         for k, v in e.items():
-            if k != id_column:
+            if k != id_column and k not in except_array_columns:
                 e_output = {**e_output, k: v}
+            elif k != id_column and k in except_array_columns:
+                except_output = {**except_output, k: v}
         if e[id_column] in output:
-            output = {**output, e[id_column]: [*output[e[id_column]], e_output]}
+            output = {
+                **output,
+                e[id_column]: {
+                    **except_output,
+                    "data": [*output[e[id_column]]["data"], e_output],
+                },
+            }
         else:
-            output = {**output, e[id_column]: [e_output]}
+            output = {**output, e[id_column]: {**except_output, "data": [e_output]}}
     return output

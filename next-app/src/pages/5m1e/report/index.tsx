@@ -140,7 +140,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     if (!path_t) return;
     if (!categoryValue) return;
 
-    setItemList(list_items[path_t.toString()][categoryValue]);
+    setItemList(list_items[path_t.toString()][categoryValue].data);
 
     // reset "List" when change "Category"
     setListItemSelectedValue(undefined);
@@ -314,7 +314,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
   function getReportData(values: any): ReportDataType {
     const detailValue: string[] = values.detail.map((detail: string) =>
       detail === "other"
-        ? `${detail}:${
+        ? `${detail} : ${
             (document.getElementById("detail-input") as HTMLInputElement).value
           }`
         : detail

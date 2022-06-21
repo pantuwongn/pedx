@@ -14,6 +14,7 @@ class ErrorCode(str,Enum):
     REGISTER_EMAIL_INVALID = "Email format is invalid"
     USER_NOT_FOUND = "User is not found"
     USER_NOT_VERIFIED = "User is not verfied"
+    USER_INACTIVE = "User is not active"
     EMAIL_NOT_FOUND = "Email is not found"
     PASSWORD_INCORRECT = "Password is incorrect"
     INVALID_AUTHENTICATION_SCHEME = "Invalid authentication scheme"

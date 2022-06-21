@@ -22,6 +22,7 @@ class Users(Base):
     app_line_id = Column(String)
     position_id = Column(Integer, ForeignKey("positions.position_id"))
     section_id = Column(Integer, ForeignKey("sections.section_id"))
+    concern_line = Column(postgresql.ARRAY(Integer),default="{}")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True))
     is_active = Column(Boolean,default=False)

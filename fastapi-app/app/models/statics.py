@@ -13,19 +13,29 @@ from sqlalchemy.sql import func
 
 from app.database import Base
 
+
 class Groups(Base):
     __tablename__ = "groups"
-    
-    group_id = Column(Integer,Sequence("groups_group_id_seq"),primary_key=True)
-    group_name = Column(String,nullable=False,unique=True)
+
+    group_id = Column(Integer, Sequence("groups_group_id_seq"), primary_key=True)
+    group_name = Column(String, nullable=False, unique=True)
+
+    member = relationship("GroupMembers", back_populates="group")
+    action = relationship("Actions", secondary="actions_groups", back_populates="group")
+    activity = relationship(
+        "Activities", secondary="activities_groups", back_populates="group"
+    )
+
 
 class GroupMembers(Base):
     __tablename__ = "group_members"
-    
-    id = Column(Integer,Sequence("group_members_id_seq"),primary_key=True)
-    group_id = Column(Integer,ForeignKey("groups.group_id"))
-    user_uuid = Column(postgresql.UUID(as_uuid=True),ForeignKey("users.user_uuid"))
-    
+
+    id = Column(Integer, Sequence("group_members_id_seq"), primary_key=True)
+    group_id = Column(Integer, ForeignKey("groups.group_id"))
+    user_uuid = Column(postgresql.UUID(as_uuid=True), ForeignKey("users.user_uuid"))
+
+    group = relationship("Groups", back_populates="member")
+
 
 class Sections(Base):
     __tablename__ = "sections"
@@ -213,7 +223,8 @@ class RequestProcesses(Base):
         Integer, Sequence("request_processes_request_process_id_seq"), primary_key=True
     )
     request_process_name = Column(String, nullable=False, unique=True)
-    request_process_short_name = Column(String,nullable=False)
+    request_process_short_name = Column(String, nullable=False)
+    request_process_tag_name = Column(String,nullable=False,default="")
 
     user = relationship(
         "Users", secondary="process_admin", back_populates="request_process"
@@ -268,7 +279,7 @@ class Transitions(Base):
     request_process_id = Column(
         Integer, ForeignKey("request_processes.request_process_id"), nullable=False
     )
-    description = Column(String,default="")
+    description = Column(String, default="")
 
     state_current = relationship("States", back_populates="current_state")
     state_next = relationship("States", back_populates="next_state")
@@ -310,6 +321,7 @@ class Actions(Base):
         "Transitions", secondary="transitions_actions", back_populates="action"
     )
     request_action = relationship("RequestActions", back_populates="action")
+    group = relationship("Groups", secondary="actions_groups", back_populates="action")
 
 
 class ActivityTypes(Base):
@@ -343,6 +355,9 @@ class Activities(Base):
     )
     transition = relationship(
         "Transitions", secondary="transitions_activities", back_populates="activity"
+    )
+    group = relationship(
+        "Groups", secondary="activities_groups", back_populates="activity"
     )
 
 
@@ -446,7 +461,7 @@ class TransitionsActions(Base):
     id = Column(Integer, Sequence("transitions_actions_id_seq"), primary_key=True)
     transition_id = Column(Integer, ForeignKey("transitions.transition_id"))
     action_id = Column(Integer, ForeignKey("actions.action_id"))
-    description = Column(String,default="")
+    description = Column(String, default="")
 
 
 class StatesActivities(Base):
@@ -455,7 +470,7 @@ class StatesActivities(Base):
     id = Column(Integer, Sequence("states_activities_id_seq"), primary_key=True)
     state_id = Column(Integer, ForeignKey("states.state_id"))
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
-    description = Column(String,default="")
+    description = Column(String, default="")
 
 
 class TransitionsActivities(Base):
@@ -464,4 +479,20 @@ class TransitionsActivities(Base):
     id = Column(Integer, Sequence("transitions_activities_id_seq"), primary_key=True)
     transition_id = Column(Integer, ForeignKey("transitions.transition_id"))
     activity_id = Column(Integer, ForeignKey("activities.activity_id"))
-    description = Column(String,default="")
+    description = Column(String, default="")
+
+
+class ActionsGroups(Base):
+    __tablename__ = "actions_groups"
+
+    id = Column(Integer, Sequence("actions_groups_id_seq"), primary_key=True)
+    action_id = Column(Integer, ForeignKey("actions.action_id"), nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.group_id"), nullable=False)
+
+
+class ActivitiesGroups(Base):
+    __tablename__ = "activities_groups"
+
+    id = Column(Integer, Sequence("activites_groups_id_seq"), primary_key=True)
+    activity_id = Column(Integer, ForeignKey("activities.activity_id"), nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.group_id"), nullable=False)

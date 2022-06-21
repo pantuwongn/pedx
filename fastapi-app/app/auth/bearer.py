@@ -1,4 +1,4 @@
-from jwcrypto import jwt, jwk
+from jwcrypto import jwk
 from typing import Optional, Dict, List
 from datetime import datetime
 from fastapi import Request, HTTPException, Depends
@@ -32,7 +32,10 @@ class BearerResponse(BaseModel):
     email: str
     position_id: int
     section_id: int
-    concern_section: List[int]
+    concern_line: List[int]
+    created_at: str
+    updated_at: str
+    is_active: bool
     
     is_admin: bool
     is_viewer: bool

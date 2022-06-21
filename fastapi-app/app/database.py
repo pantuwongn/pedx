@@ -15,7 +15,7 @@ ms_session = sessionmaker(autocommit=False,autoflush=False,bind=ms_engine)
 # PostgreSQL async
 PG_ASYNC_SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/pe-1"
 
-pg_async_engine = create_async_engine(PG_ASYNC_SQLALCHEMY_DATABASE_URL,echo=True,pool_size=20,max_overflow=0)
+pg_async_engine = create_async_engine(PG_ASYNC_SQLALCHEMY_DATABASE_URL,echo=True,pool_size=40,max_overflow=0)
 pg_async_session = sessionmaker(pg_async_engine,expire_on_commit=False,class_=AsyncSession)
 
 Base = declarative_base()

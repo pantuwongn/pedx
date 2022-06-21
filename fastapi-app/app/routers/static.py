@@ -28,8 +28,8 @@ def static_routers(db: AsyncGenerator) -> APIRouter:
             parts_machines,
         ) = await asyncio.gather(
             crud.get_request_processes(db),
-            crud.get_list_items(1, db),  # problem
-            crud.get_list_items(2, db),  # changepoint
+            crud.get_list_items([1], db),  # problem
+            crud.get_list_items([2], db),  # changepoint
             crud.get_item_details(db),
             crud.get_products(db),
             crud.get_lines(db),
@@ -75,8 +75,12 @@ def static_routers(db: AsyncGenerator) -> APIRouter:
             parts,
             models,
             models_parts,
+            models_customers,
             customers_join_plants,
             request_processes,
+            list_items_problem,
+            list_items_changepoint,
+            state_types,
             states_join_types,
             actions_join_types,
             transitions_join_transitions_actions,
@@ -96,15 +100,19 @@ def static_routers(db: AsyncGenerator) -> APIRouter:
             crud.get_parts(db),
             crud.get_models(db),
             crud.get_models_parts(db),
+            crud.get_models_customers(db),
             crud.get_join_customers_plants(db),
             crud.get_request_processes(db),
+            crud.get_list_items([1], db),  # problem
+            crud.get_list_items([2], db),  # changepoint
+            crud.get_state_types(db),
             crud.get_join_states_types([1, 2], db),
             crud.get_join_actions_types([1, 2], db),
-            crud.get_join_transitions_transition_actions([1,2],db),
+            crud.get_join_transitions_transition_actions([1, 2], db),
         )
 
         data = {
-            "users_join_roles": users_join_roles_positions,
+            "users_join_roles_positions": users_join_roles_positions,
             "groups": groups,
             "group_members": group_members,
             "departments": department,
@@ -119,8 +127,12 @@ def static_routers(db: AsyncGenerator) -> APIRouter:
             "parts": parts,
             "models": models,
             "models_parts": models_parts,
+            "models_customers": models_customers,
             "customers_join_plants": customers_join_plants,
             "request_processes": request_processes,
+            "list_items_problem": list_items_problem,
+            "list_items_changepoint": list_items_changepoint,
+            "state_types": state_types,
             "states_join_types": states_join_types,
             "actions_join_types": actions_join_types,
             "transitions_join_transitions_actions": transitions_join_transitions_actions,

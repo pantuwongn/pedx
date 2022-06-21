@@ -10,7 +10,7 @@ class staticdataCRUD:
 
     async def get_users(self, db: AsyncSession):
         stmt = "SELECT * FROM users"
-        rs = toArrayWithKey(await db.execute(stmt),['user_pass'])
+        rs = toArrayWithKey(await db.execute(stmt), ["user_pass"])
         rs = toDictByColumnId(rs, "user_uuid")
         return rs
 
@@ -20,29 +20,29 @@ class staticdataCRUD:
         JOIN roles USING (user_uuid)
         JOIN positions USING (position_id)
         """
-        rs = toArrayWithKey(await db.execute(stmt),['user_pass'])
+        rs = toArrayWithKey(await db.execute(stmt), ["user_pass"])
         rs = toDictByColumnId(rs, "user_uuid")
         return rs
-    
-    async def get_roles(self,db:AsyncSession):
+
+    async def get_roles(self, db: AsyncSession):
         stmt = "SELECT * FROM roles"
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictByColumnId(rs,'user_uuid')
+        rs = toDictByColumnId(rs, "user_uuid")
         return rs
-    
+
     async def get_positions(self, db: AsyncSession):
         stmt = "SELECT * FROM positions"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "position_id")
         return rs
-    
-    async def get_groups(self,db:AsyncSession):
+
+    async def get_groups(self, db: AsyncSession):
         stmt = "SELECT * FROM groups"
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictByColumnId(rs,"group_id")
+        rs = toDictByColumnId(rs, "group_id")
         return rs
-    
-    async def get_group_members(self,db:AsyncSession):
+
+    async def get_group_members(self, db: AsyncSession):
         stmt = "SELECT * FROM group_members"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictArrayByColumnId(rs, "group_id")
@@ -69,7 +69,7 @@ class staticdataCRUD:
     async def get_machines(self, db: AsyncSession):
         stmt = "SELECT * FROM machines"
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictArrayByColumnId(rs, "machine_no")
+        rs = toDictByColumnId(rs, "machine_no")
         return rs
 
     async def get_processes(self, db: AsyncSession):
@@ -114,7 +114,7 @@ class staticdataCRUD:
     async def get_customer_plants(self, db: AsyncSession):
         stmt = "SELECT * FROM customer_plants"
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictByColumnId(rs, "customer_plant_id")
+        rs = toDictArrayByColumnId(rs, "customer_id")
         return rs
 
     async def get_join_customers_plants(self, db: AsyncSession):
@@ -123,7 +123,9 @@ class staticdataCRUD:
         USING (customer_id)
         """
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictByColumnId(rs, "customer_id")
+        rs = toDictArrayByColumnId(
+            rs, "customer_id", ["customer_name", "customer_short_name"]
+        )
         return rs
 
     async def get_products(self, db: AsyncSession):
@@ -141,7 +143,7 @@ class staticdataCRUD:
     async def get_models_customers(self, db: AsyncSession):
         stmt = "SELECT * FROM models_customers"
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = toDictByColumnId(rs, "id")
+        rs = toDictArrayByColumnId(rs, "model_id")
         return rs
 
     async def get_parts(self, db: AsyncSession):
@@ -190,7 +192,8 @@ class staticdataCRUD:
         return rs
 
     async def get_states(self, process_id: list[int], db: AsyncSession):
-        stmt = f"SELECT * FROM states WHERE request_process_id IN {tuple(process_id)}"
+        list = ",".join([str(i) for i in process_id])
+        stmt = f"SELECT * FROM states WHERE request_process_id IN ({list})"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "state_id")
         return rs
@@ -202,19 +205,19 @@ class staticdataCRUD:
         return rs
 
     async def get_join_states_types(self, process_id: list[int], db: AsyncSession):
+        list = ",".join([str(i) for i in process_id])
         stmt = f"""SELECT * FROM states
         JOIN state_types
         USING (state_type_id)
-        WHERE request_process_id IN {tuple(process_id)}
+        WHERE request_process_id IN ({list})
         """
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "state_id")
         return rs
 
     async def get_transitions(self, process_id: list[int], db: AsyncSession):
-        stmt = (
-            f"SELECT * FROM transitions WHERE request_process_id IN {tuple(process_id)}"
-        )
+        list = ",".join([str(i) for i in process_id])
+        stmt = f"SELECT * FROM transitions WHERE request_process_id IN ({list})"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "transition_id")
         return rs
@@ -226,7 +229,8 @@ class staticdataCRUD:
         return rs
 
     async def get_actions(self, process_id: list[int], db: AsyncSession):
-        stmt = f"SELECT * FROM actions WHERE request_process_id IN {tuple(process_id)}"
+        list = ",".join([str(i) for i in process_id])
+        stmt = f"SELECT * FROM actions WHERE request_process_id IN ({list})"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "action_id")
         return rs
@@ -238,10 +242,11 @@ class staticdataCRUD:
         return rs
 
     async def get_join_actions_types(self, process_id: list[int], db: AsyncSession):
+        list = ",".join([str(i) for i in process_id])
         stmt = f"""SELECT * FROM actions
         JOIN action_types
         USING (action_type_id)
-        WHERE request_process_id IN {tuple(process_id)}
+        WHERE request_process_id IN ({list})
         """
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "action_id")
@@ -252,12 +257,15 @@ class staticdataCRUD:
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "transition_id")
         return rs
-    
-    async def get_join_transitions_transition_actions(self,process_id:list[int],db: AsyncSession):
+
+    async def get_join_transitions_transition_actions(
+        self, process_id: list[int], db: AsyncSession
+    ):
+        list = ",".join([str(i) for i in process_id])
         stmt = f"""
             SELECT * FROM transitions
             JOIN transitions_actions USING (transition_id)
-            WHERE request_process_id IN {tuple(process_id)}
+            WHERE request_process_id IN ({list})
         """
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "transition_id")
@@ -270,9 +278,8 @@ class staticdataCRUD:
         return rs
 
     async def get_activities(self, process_id: list[int], db: AsyncSession):
-        stmt = (
-            f"SELECT * FROM activities WHERE request_process_id IN {tuple(process_id)}"
-        )
+        list = ",".join([str(i) for i in process_id])
+        stmt = f"SELECT * FROM activities WHERE request_process_id IN ({list})"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictByColumnId(rs, "activity_id")
         return rs
@@ -308,7 +315,8 @@ class staticdataCRUD:
         return rs
 
     async def get_list_items(self, request_process_id: list[int], db: AsyncSession):
-        stmt = f"SELECT * FROM list_items WHERE request_process_id IN '{tuple(request_process_id)}'"
+        list = ",".join([str(i) for i in request_process_id])
+        stmt = f"SELECT * FROM list_items WHERE request_process_id IN ({list})"
         rs = toArrayWithKey(await db.execute(stmt))
         rs = toDictArrayByColumnId(rs, "category")
         return rs

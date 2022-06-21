@@ -7,6 +7,7 @@ export type User = {
   email: string;
   position_id: number;
   section_id: number;
+  concern_line: number[];
   created_at: string;
   updated_at: string;
   is_active: boolean;
@@ -17,10 +18,8 @@ export type User = {
   is_approver: boolean;
   qar_recorder: boolean;
   qar_editor: boolean;
-
   avatarUrl: string;
   access_token: string;
-  refresh_token: string;
 };
 
 export type UserType = {
@@ -75,7 +74,9 @@ export type GroupType = {
 };
 
 export type GroupMemberType = {
-  [group_id: string]: GroupMemberDataType[];
+  [group_id: string]: {
+    data: GroupMemberDataType[];
+  };
 };
 
 export type GroupMemberDataType = {
@@ -117,7 +118,9 @@ export type LinePartType = {
 };
 
 export type LineUserType = {
-  [line_id: string]: LineUserDataType[];
+  [line_id: string]: {
+    data: LineUserDataType[];
+  };
 };
 
 export type LineUserDataType = {
@@ -172,9 +175,13 @@ export type ProcessJoinTypeDataType = {
 
 export type ProcessSymbolType = {
   [process_id: string]: {
-    id: number;
-    sc_symbol_id: number;
-  }[];
+    data: ProcessSymbolDataType[];
+  };
+};
+
+export type ProcessSymbolDataType = {
+  id: number;
+  sc_symbol_id: number;
 };
 
 export type SCSymbolType = {
@@ -213,6 +220,17 @@ export type ModelPartType = {
   };
 };
 
+export type ModelCustomerType = {
+  [model_id: string]: {
+    data: ModelCustomerDataType[];
+  };
+};
+
+export type ModelCustomerDataType = {
+  id: number;
+  customer_id: number;
+};
+
 export type CustomerType = {
   [customer_id: string]: CustomerDataType;
 };
@@ -223,12 +241,14 @@ export type CustomerDataType = {
 };
 
 export type CustomerPlantType = {
-  [customer_plant_id: string]: CustomerPlantDataType;
+  [customer_id: string]: {
+    data: CustomerPlantDataType[];
+  };
 };
 
 export type CustomerPlantDataType = {
+  customer_plant_id: number;
   customer_plant_name: string;
-  customer_id: number;
 };
 
 export type CustomerJoinPlantType = {
@@ -237,10 +257,9 @@ export type CustomerJoinPlantType = {
 
 export type CustomerJoinPlantDataType = {
   customer_name: string;
-  customer_short_name: string;
-  customer_plant_id: number;
-  customer_plant_name: string;
-}
+  customer_short_name: string | null;
+  data: CustomerPlantDataType[];
+};
 
 export type PartType = {
   [part_no: string]: PartDataType;
@@ -272,9 +291,10 @@ export type SubPartType = {
 
 // Request
 export type RequestProcessType = {
-  [request_process_id: number]: {
+  [request_process_id: string]: {
     request_process_name: string;
     request_process_short_name: string;
+    request_process_tag_name: string;
   };
 };
 
@@ -293,12 +313,15 @@ export type ListItemDataType = {
 };
 
 export type ListItemType = {
-  Man: ListItemDataType[];
-  Machine: ListItemDataType[];
-  Method: ListItemDataType[];
-  Material: ListItemDataType[];
-  Measurement: ListItemDataType[];
-  Environment: ListItemDataType[];
+  [category: string]: {
+    data: ListItemDataType[];
+  };
+  // Man: ListItemDataType[];
+  // Machine: ListItemDataType[];
+  // Method: ListItemDataType[];
+  // Material: ListItemDataType[];
+  // Measurement: ListItemDataType[];
+  // Environment: ListItemDataType[];
 };
 
 export type ItemDetailType = {

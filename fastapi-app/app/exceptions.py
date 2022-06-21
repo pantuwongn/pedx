@@ -7,6 +7,11 @@ class UserNotFound(AppException):
     pass
 
 
+class UserInactive(AppException):
+    # User is inactive
+    pass
+
+
 class PasswordIncorrect(AppException):
     # password not matching with hashed_password
     pass

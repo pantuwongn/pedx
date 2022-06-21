@@ -43,7 +43,9 @@ class UserManager:
             )
         except exceptions.UserNotFound:
             raise HTTPException(status_code=400, detail=ErrorCode.USER_NOT_FOUND)
-
+        except exceptions.UserInactive:
+            raise HTTPException(status_code=400,detail=ErrorCode.USER_INACTIVE)
+        
         return user_data[0]
 
     async def get_by_email(

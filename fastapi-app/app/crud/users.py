@@ -36,9 +36,10 @@ class UsersCRUD:
         rs = toArrayWithKey(
             input=await db.execute(stmt), except_column=except_column
         )
-        print(rs)
         if len(rs) == 0:
             raise exceptions.UserNotFound()
+        elif not rs[0]["is_active"]:
+            raise exceptions.UserInactive()
         return rs
 
     async def get_user_by_email(

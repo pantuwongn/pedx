@@ -20,7 +20,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         user_pass: user_pass,
       }
     );
-
+    // console.log(data)
     const user = {
       isLoggedIn: true,
       user_uuid: data.user_uuid,
@@ -30,6 +30,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       email: data.email,
       position_id: data.position_id,
       section_id: data.section_id,
+      concern_line: data.concern_line,
       created_at: data.created_at,
       updated_at: data.updated_at,
       is_active: data.is_active,
@@ -40,10 +41,8 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       is_approver: data.is_approver,
       qar_recorder: data.qar_recorder,
       qar_editor: data.qar_editor,
-
       avatarUrl: "",
       access_token: data.access_token,
-      refresh_token: data.refresh_token,
     } as User;
     req.session.user = user;
     await req.session.save();
