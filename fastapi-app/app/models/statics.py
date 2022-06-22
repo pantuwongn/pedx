@@ -124,7 +124,7 @@ class SCSymbols(Base):
     character = Column(String(10), nullable=False)
     shape = Column(
         postgresql.ENUM(
-            "circle", "diamond", "triangle", "None", name="sc_symbols_shape_enum"
+            "circle", "diamond", "triangle", "none", name="sc_symbols_shape_enum"
         ),
         nullable=False,
     )

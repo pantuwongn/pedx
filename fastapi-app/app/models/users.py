@@ -22,15 +22,15 @@ class Users(Base):
     app_line_id = Column(String)
     position_id = Column(Integer, ForeignKey("positions.position_id"))
     section_id = Column(Integer, ForeignKey("sections.section_id"))
-    concern_line = Column(postgresql.ARRAY(Integer),default="{}")
+    concern_line = Column(postgresql.ARRAY(Integer), default="{}")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True))
-    is_active = Column(Boolean,default=False)
+    is_active = Column(Boolean, default=False)
 
     role = relationship("Roles", back_populates="user")
     position = relationship("Positions", back_populates="user")
     section = relationship("Sections", back_populates="user")
-    line = relationship("Lines",secondary="lines_users",back_populates="user")
+    line = relationship("Lines", secondary="lines_users", back_populates="user")
     request_process = relationship(
         "RequestProcesses", secondary="process_admin", back_populates="user"
     )
@@ -40,7 +40,9 @@ class Users(Base):
     request_concern = relationship(
         "Requests", secondary="request_concerned", back_populates="user_concern"
     )
-    request_process = relationship("RequestProcesses", secondary="process_admin", back_populates="user")
+    request_process = relationship(
+        "RequestProcesses", secondary="process_admin", back_populates="user"
+    )
 
 
 class Roles(Base):
@@ -69,6 +71,12 @@ class Positions(Base):
     position_level = Column(Integer, nullable=False)
     position_name = Column(String, nullable=False)
     position_full_name = Column(String, nullable=False)
+    position_group = Column(
+        postgresql.ENUM(
+            "Direct","Indirect", name="position_group_enum"
+        ),
+        nullable=False,
+    )
 
     user = relationship("Users", back_populates="position")
 
