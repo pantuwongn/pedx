@@ -23,6 +23,7 @@ class UserCreate(UserLogin):
     app_line_id: Optional[str] = ""
     position_id: int
     section_id: int
+    concern_line: Optional[List[int]] = []
     is_active: bool = False
     class Config:
         orm_mode = True

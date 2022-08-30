@@ -44,7 +44,7 @@ class TestListen:
 
     async def db_events(self):
         conn = await asyncpg.connect(
-            dsn="postgresql://postgres:postgres@localhost:5432/testdb"
+            dsn="postgresql://postgres:postgres@localhost:5432/pe-dx"
         )
         print("connected", conn)
         await self.listen(conn, "test")

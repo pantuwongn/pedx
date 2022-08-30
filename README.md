@@ -34,16 +34,16 @@ EMAIL_ADDRESS = "...@gmail.com"
 EMAIL_PASS = "..."
 # database parameter for MSSQL
 MSSQL_USER = "sa"
-MSSQL_PASS = "maewnarm"
-MSSQL_SERVER = "DESKTOP-8N46EGS\SQLEXPRESS"
+MSSQL_PASS = "EPPE%407348"
+MSSQL_SERVER = "172.23.3.18"
 MSSQL_PORT = "1433"
-MSSQL_DB = "testdb"
+MSSQL_DB = "ProductionSystem?driver=ODBC+Driver+17+for+SQL+Server"
 # database parameter for PostgreSQL
 PG_USER = "postgres"
-PG_PASS = "postgres"
+PG_PASS = "eppe"
 PG_SERVER = "localhost"
 PG_PORT = "5432"
-PG_DB = "pe-1"
+PG_DB = "pe-dx"
 # JWK secret key for encrypt and decrypt JWE token
 # generate by python
 # >>> from jwcrypto import jwk

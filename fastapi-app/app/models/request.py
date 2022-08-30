@@ -125,7 +125,7 @@ class RequestConcerned(Base):
         postgresql.UUID(as_uuid=True), ForeignKey("requests.request_id")
     )
     user_uuid = Column(postgresql.UUID(as_uuid=True), ForeignKey("users.user_uuid"),nullable=True)
-    group_id = Column(Integer,ForeignKey("groups.group_id"))
+    # group_id = Column(Integer,ForeignKey("groups.group_id"))
 
 
 class MainSubRequest(Base):

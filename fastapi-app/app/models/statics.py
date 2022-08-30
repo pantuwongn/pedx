@@ -37,6 +37,17 @@ class GroupMembers(Base):
     group = relationship("Groups", back_populates="member")
 
 
+class Departments(Base):
+    __tablename__ = "departments"
+
+    department_id = Column(
+        Integer, Sequence("departments_dartpartment_id_seq"), primary_key=True
+    )
+    department_name = Column(String, nullable=False, unique=True)
+
+    section = relationship("Sections", back_populates="department")
+
+
 class Sections(Base):
     __tablename__ = "sections"
 
@@ -48,17 +59,6 @@ class Sections(Base):
     department = relationship("Departments", back_populates="section")
     user = relationship("Users", back_populates="section")
     line = relationship("Lines", back_populates="section")
-
-
-class Departments(Base):
-    __tablename__ = "departments"
-
-    department_id = Column(
-        Integer, Sequence("departments_dartpartment_id_seq"), primary_key=True
-    )
-    department_name = Column(String, nullable=False, unique=True)
-
-    section = relationship("Sections", back_populates="department")
 
 
 class Lines(Base):
@@ -90,6 +90,17 @@ class Machines(Base):
     part = relationship("Parts", secondary="parts_machines", back_populates="machine")
 
 
+class ProcessTypes(Base):
+    __tablename__ = "process_types"
+
+    process_type_id = Column(
+        Integer, Sequence("process_types_process_type_id_seq"), primary_key=True
+    )
+    process_type_name = Column(String, nullable=False)
+
+    process = relationship("Processes", back_populates="process_type")
+
+
 class Processes(Base):
     __tablename__ = "processes"
 
@@ -104,15 +115,7 @@ class Processes(Base):
     symbol = relationship(
         "SCSymbols", secondary="processes_symbols", back_populates="process"
     )
-
-
-class ProcessTypes(Base):
-    __tablename__ = "process_types"
-
-    process_type_id = Column(
-        Integer, Sequence("process_types_process_type_id_seq"), primary_key=True
-    )
-    process_type_name = Column(String, nullable=False)
+    process_type = relationship("ProcessTypes", back_populates="process")
 
 
 class SCSymbols(Base):
@@ -151,7 +154,7 @@ class Models(Base):
     model_id = Column(Integer, Sequence("model_model_id_seq"), primary_key=True)
     model_code = Column(String, nullable=False)
     model_name = Column(String, default="")
-    customer_id = Column(Integer, ForeignKey("customers.customer_id"))
+    # customer_id = Column(Integer, ForeignKey("customers.customer_id"))
 
     part = relationship("Parts", secondary="models_parts", back_populates="model")
     customer = relationship(
@@ -224,7 +227,7 @@ class RequestProcesses(Base):
     )
     request_process_name = Column(String, nullable=False, unique=True)
     request_process_short_name = Column(String, nullable=False)
-    request_process_tag_name = Column(String,nullable=False,default="")
+    request_process_tag_name = Column(String, nullable=False, default="")
 
     user = relationship(
         "Users", secondary="process_admin", back_populates="request_process"
@@ -382,7 +385,7 @@ class ItemDetails(Base):
     item_detail_id = Column(
         Integer, Sequence("item_details_item_detail_id"), primary_key=True
     )
-    item_detail = Column(postgresql.ARRAY(String), default="")
+    item_detail = Column(String, default="")
     list_item_id = Column(Integer, ForeignKey("list_items.list_item_id"))
 
     list_item = relationship("ListItems", back_populates="item_detail")
