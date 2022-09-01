@@ -33,17 +33,17 @@ BASE_URL_BACKEND = http://127.0.0.1:8000
 EMAIL_ADDRESS = "...@gmail.com"
 EMAIL_PASS = "..."
 # database parameter for MSSQL
-MSSQL_USER = "sa"
-MSSQL_PASS = "EPPE%407348"
-MSSQL_SERVER = "172.23.3.18"
-MSSQL_PORT = "1433"
-MSSQL_DB = "ProductionSystem?driver=ODBC+Driver+17+for+SQL+Server"
+MSSQL_USER = ""
+MSSQL_PASS = ""
+MSSQL_SERVER = ""
+MSSQL_PORT = ""
+MSSQL_DB = ""
 # database parameter for PostgreSQL
-PG_USER = "postgres"
-PG_PASS = "eppe"
-PG_SERVER = "localhost"
-PG_PORT = "5432"
-PG_DB = "pe-dx"
+PG_USER = ""
+PG_PASS = ""
+PG_SERVER = ""
+PG_PORT = ""
+PG_DB = ""
 # JWK secret key for encrypt and decrypt JWE token
 # generate by python
 # >>> from jwcrypto import jwk
