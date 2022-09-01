@@ -242,7 +242,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     setPartNo(undefined);
     form.resetFields(["part"]);
   }, [machineNo]);
-
+  //CHECK POINT!
   useEffect(() => {
     // set inputChanged status
     setInputChanged(true);
@@ -315,9 +315,10 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
       detail === "other"
         ? `${detail} : ${
             (document.getElementById("detail-input") as HTMLInputElement).value
-          }`
+          }` //seem to not right
         : detail
     );
+    console.log(values.detail)
     const request_process_id = path_t === "problem" ? 1 : 2;
     return {
       request_process_id: request_process_id,
