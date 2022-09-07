@@ -6,21 +6,27 @@ export function getSymbol(
   remark: string,
   index: number
 ): JSX.Element {
-  return <Tooltip key={index} title={remark}>{symbol(character, shape)}</Tooltip>;
+  return (
+    <Tooltip key={index} title={remark}>
+      {symbol(character, shape, remark)}
+    </Tooltip>
+  );
 }
 
-function symbol(character: string, shape: string) {
+function symbol(character: string, shape: string, remark: string) {
   if (shape === "diamond") {
     return (
-      <svg width={100} height={100}>
+      <svg className={remark} viewBox="0 0 120 120" width={120} height={120}>
         <rect
-          width={68}
-          height={68}
+          width={78}
+          height={78}
           x={"36.06%"}
           y={"-33.23%"}
           transform={"rotate(45)"}
-          strokeWidth={2}
-          fill="none"
+          strokeWidth={4}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(220, 0, 50)"}
+          fillOpacity={"90%"}
         />
         <text
           x="50%"
@@ -28,6 +34,9 @@ function symbol(character: string, shape: string) {
           dominantBaseline="middle"
           textAnchor="middle"
           fontSize={60}
+          fontWeight={400}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(0, 0, 0)"}
         >
           {character}
         </text>
@@ -35,15 +44,17 @@ function symbol(character: string, shape: string) {
     );
   } else if (shape === "circle") {
     return (
-      <svg width={100} height={100}>
+      <svg className={remark} viewBox="0 0 140 140" width={120} height={120}>
         <circle
-          width={98}
-          height={98}
+          width={118}
+          height={118}
           cx={"50%"}
           cy={"50%"}
-          r={49}
-          strokeWidth={2}
-          fill="none"
+          r={65}
+          strokeWidth={4}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(220, 0, 50)"}
+          fillOpacity={"90%"}
         />
         <text
           x="50%"
@@ -51,33 +62,50 @@ function symbol(character: string, shape: string) {
           dominantBaseline="middle"
           textAnchor="middle"
           fontSize={60}
+          fontWeight={400}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(0, 0, 0)"}
         >
           {character}
         </text>
       </svg>
     );
   } else if (shape === "triangle") {
-    <svg width={120} height={90}>
-      <polygon points="60,1 1,89 119,89" strokeWidth={2} fill="none" />
-      <text
-        x="50%"
-        y="80%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize={60}
-      >
-        {character}
-      </text>
-    </svg>;
+    return (
+      <svg className={remark} viewBox="0 0 120 120" width={120} height={110}>
+        <polygon
+          points="60,2 2,108 118,108"
+          strokeWidth={4}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(220, 0, 50)"}
+          fillOpacity={"90%"}
+        />
+        <text
+          x="50%"
+          y="70%"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          fontSize={60}
+          fontWeight={400}
+          stroke={"rgb(0, 0, 0)"}
+          fill={"rgb(0, 0, 0)"}
+        >
+          {character}
+        </text>
+      </svg>
+    );
   }
   return (
-    <svg width={100} height={100}>
+    <svg className={remark} viewBox="0 0 140 120" width={140} height={120}>
       <text
         x="50%"
-        y="50%"
+        y="60%"
         dominantBaseline="middle"
         textAnchor="middle"
-        fontSize={60}
+        fontSize={100}
+        fontWeight={650}
+        stroke={"rgb(230,230,230)"}
+        fill={"rgb(0, 0, 0)"}
       >
         {character}
       </text>

@@ -18,14 +18,15 @@ class RequestCRUD:
         stmt = st.post_submit_request_stmt(request_id, submit_data)
         rs = toArrayWithKey(await db.execute(stmt))
         await db.commit()
-        return {"request_no": rs[0].request_no}
+        return {"request_no": rs[0]['request_no']}
 
     async def get_all_requests_by_type(
         self, process_id: list[int], process_name: str, db: AsyncSession
     ) -> dict:
+
         stmt = st.get_all_requests_stmt(process_id, process_name)
         rs = toArrayWithKey(await db.execute(stmt))
-        rs = rearrangeRequestActionData(rs, "request_id")
+        rs = rearrangeRequestActionData(rs, "request_no")
         return rs
 
     async def get_request(self, id: str, db: AsyncSession) -> dict:

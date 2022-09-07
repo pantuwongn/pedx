@@ -26,9 +26,14 @@ def request_routers(db: AsyncGenerator) -> APIRouter:
     @router.get(
         "/get/allrequests", dependencies=[Depends(BearerDependency(auto_error=False))]
     )
-    async def get_all_requests_by_type(t: str,t_name:str, db: AsyncSession = Depends(db)):
+    async def get_all_requests_by_type(
+        t: str, t_name: str, db: AsyncSession = Depends(db)
+    ):
         ids = list(map(int, t.split(",")))
-        requests = await crud.get_all_requests_by_type(process_id=ids,process_name=t_name, db=db)
+        print("ids = ", ids)
+        requests = await crud.get_all_requests_by_type(
+            process_id=ids, process_name=t_name, db=db
+        )
         return requests
 
     @router.get(

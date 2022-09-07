@@ -75,7 +75,7 @@ type DashboardPropsTypes = {
   machines: MachineType;
   processes_join_types: ProcessJoinTypeType;
   sc_symbols: SCSymbolType;
-  processes_symbol: ProcessSymbolType;
+  processes_symbols: ProcessSymbolType;
   products: ProductType;
   parts: PartType;
   models: ModelType;
@@ -159,7 +159,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     machines,
     processes_join_types,
     sc_symbols,
-    processes_symbol,
+    processes_symbols,
     products,
     parts,
     models,
@@ -197,41 +197,6 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
   >({});
   const [sortedInfo, setSortedInfo] = useState<SorterResult<TableDataType>>({});
 
-  useEffect(() => {
-    // initialize socket connection
-    socketInitialize();
-
-    // initialize columns of table
-    InitialCreateColumns();
-
-    async function InitialLoadAllRequestsData() {
-      setIsLoading(true);
-      await loadAllRequestData();
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-    }
-    InitialLoadAllRequestsData();
-  }, []);
-
-  useEffect(() => {
-    const { t, c, p, l, li, i, m } = pathQuery;
-    if (typeof t === "string") {
-      setTableType(t);
-    }
-    const selector = {
-      type: t,
-      category: c,
-      part: p,
-      line: l,
-      list: li,
-      informer: i,
-      manager: m,
-    };
-    form.setFieldsValue(selector);
-    onSearchSubmit(selector);
-  }, [pathQuery]);
-
   async function socketInitialize() {
     // await fetch("/api/socket");
     socket = io("http://127.0.0.1:8000/", {
@@ -257,7 +222,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     // });
   }
 
-  function InitialCreateColumns() {
+  function CreateColumns() {
     const columns: ColumnsType<TableDataType> = [
       {
         key: "created",
@@ -265,9 +230,8 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         dataIndex: "createdAt",
         fixed: "left",
         width: 150,
-        sorter: (a, b) => ("" + a.createdAt).localeCompare(b.createdAt),
-        sortOrder:
-          sortedInfo.columnKey === "created_date" ? sortedInfo.order : null,
+        sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
+        sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
         defaultSortOrder: "descend",
       },
       {
@@ -286,7 +250,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
           return record.type.replace(/\s+/g, "").toLowerCase() === value;
         },
         filteredValue: filteredInfo.type || null,
-        sorter: (a, b) => ("" + a.type).localeCompare(b.type),
+        sorter: (a, b) => a.type.localeCompare(b.type),
         sortOrder: sortedInfo.columnKey === "type" ? sortedInfo.order : null,
         render: (_, { type }) => (
           <div className="table-column__type">
@@ -313,7 +277,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         onFilter: (value: any, record) =>
           record.category.indexOf(value.toString()) >= 0,
         filteredValue: filteredInfo.category || null,
-        sorter: (a, b) => ("" + a.category).localeCompare(b.category),
+        sorter: (a, b) => a.category.localeCompare(b.category),
         sortOrder:
           sortedInfo.columnKey === "category" ? sortedInfo.order : null,
       },
@@ -332,9 +296,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
           record.productName.short_name.indexOf(value.toString()) >= 0,
         filteredValue: filteredInfo.productName || null,
         sorter: (a, b) =>
-          ("" + a.productName.short_name).localeCompare(
-            b.productName.short_name
-          ),
+          a.productName.short_name.localeCompare(b.productName.short_name),
         sortOrder: sortedInfo.columnKey === "product" ? sortedInfo.order : null,
         render: (productName) => (
           <Tooltip title={productName.full_name}>
@@ -353,7 +315,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         onFilter: (value: any, record) =>
           record.partName.indexOf(value.toString()) >= 0,
         filteredValue: filteredInfo.partName || null,
-        sorter: (a, b) => ("" + a.partName).localeCompare(b.partName),
+        sorter: (a, b) => a.partName.localeCompare(b.partName),
         sortOrder: sortedInfo.columnKey === "part" ? sortedInfo.order : null,
         render: (part) => (
           <Tooltip placement="topLeft" title={part}>
@@ -372,8 +334,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         onFilter: (value: any, record) =>
           record.line.line_name.indexOf(value.toString()) >= 0,
         filteredValue: filteredInfo.line || null,
-        sorter: (a, b) =>
-          ("" + a.line.line_name).localeCompare(b.line.line_name),
+        sorter: (a, b) => a.line.line_name.localeCompare(b.line.line_name),
         sortOrder: sortedInfo.columnKey === "line" ? sortedInfo.order : null,
         render: (line: LineDataType) => (
           <Tooltip
@@ -483,7 +444,10 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
 
   const loadAllRequestData = async () => {
     function get_sc_symbols(process_id: string): SCSymbolDataType[] {
-      return processes_symbol[process_id].data.map(
+      if (processes_symbols[process_id] == undefined) {
+        return [{ character: "-", shape: "none", remark: "" }];
+      }
+      return processes_symbols[process_id].data.map(
         ({ sc_symbol_id }) => sc_symbols[sc_symbol_id.toString()]
       );
     }
@@ -502,9 +466,9 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         body: JSON.stringify(body),
       }
     );
-
+    // console.log("data = ", data);
     if (!data || Object.keys(data).length === 0) return;
-
+    // TODO check data fetched from backend
     // rearrange for table data format
     const rearrangedData: TableDataType[] = Object.entries(data).map(
       (
@@ -539,6 +503,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         ],
         idx
       ) => {
+        // TODO check request_process_id
         let requestType = request_processes[
           request_process_id
         ].request_process_tag_name
@@ -571,6 +536,9 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
               ({ customer_id }) => customers_join_plants[customer_id]
             )
           : undefined;
+
+        let fetchScSymbol = get_sc_symbols(process_id);
+
         return {
           key: idx,
           id: request_id,
@@ -586,7 +554,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
           modelId: modelId,
           modelData: modelId ? models[modelId] : undefined,
           process: process_id !== "-" ? processes_join_types[process_id] : "-",
-          scSymbol: process_id !== "-" ? get_sc_symbols(process_id) : "-",
+          scSymbol: fetchScSymbol[0].character !== "-" ? fetchScSymbol : "-",
           mcNo: machine_no,
           mcData: machines[machine_no],
           deptName:
@@ -643,8 +611,13 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     sorter,
     extra
   ) => {
+    console.log("Various parameters", pagination, filters, sorter, extra);
+    console.log("sorterBefore = ", sorter);
+    console.log("sortedInfoBefore = ", sortedInfo);
+
     setFilteredInfo(filters);
     setSortedInfo(sorter as SorterResult<TableDataType>);
+
     // check current data source is zero
     // then increase margin for prevent overlap
     // with clear button
@@ -673,6 +646,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
       informer: values.informer ? [values.informer] : null,
       manager: values.manager ? [values.manager] : null,
     });
+    console.log("this is filteredInfo in onSearchSubmit: ", filteredInfo);
   }
 
   const clearFilters = () => {
@@ -700,10 +674,50 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     }
   };
 
+  useEffect(() => {
+    // initialize socket connection
+    socketInitialize();
+
+    // initialize columns of table
+    CreateColumns();
+
+    async function InitialLoadAllRequestsData() {
+      setIsLoading(true);
+      await loadAllRequestData();
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    }
+    InitialLoadAllRequestsData();
+  }, []);
+
+  useEffect(() => {
+    const { t, c, p, l, li, i, m } = pathQuery;
+    if (typeof t === "string") {
+      setTableType(t);
+    }
+    const selector = {
+      type: t,
+      category: c,
+      part: p,
+      line: l,
+      list: li,
+      informer: i,
+      manager: m,
+    };
+    form.setFieldsValue(selector);
+    onSearchSubmit(selector);
+  }, [pathQuery]);
+
+  useEffect(() => {
+    console.log("sortedInfoAfter = ", sortedInfo);
+    CreateColumns()
+  }, [filteredInfo,sortedInfo]);
+
   if (!user || user.isLoggedIn === false) {
     return (
       <div className="_5m1e center-main">
-        <p>Not logged in yet, please log in before use this page.</p>
+        <p>Not logged in yet? Please log in before using this page.</p>
       </div>
     );
   }
@@ -726,11 +740,11 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
                   initialValue={tableType}
                 >
                   <Radio.Group onChange={onTypeChange}>
+                    <Radio.Button value="All">All</Radio.Button>
                     <Radio.Button value="problem">Problem</Radio.Button>
                     <Radio.Button value="changepoint">
                       Change point
                     </Radio.Button>
-                    <Radio.Button value="All">All</Radio.Button>
                   </Radio.Group>
                 </Form.Item>
                 <Form.Item label="Category" name="category">
@@ -788,7 +802,9 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
       <div className="_5m1e__dashboard__table-wrapper">
         <div className="clear-buttons__wrapper">
           <div className="clear-buttons">
-          <Button type="ghost" onClick={() => loadAllRequestData()}>Refresh</Button>
+            <Button type="ghost" onClick={() => loadAllRequestData()}>
+              Refresh
+            </Button>
             <Button type="ghost" onClick={clearFilters}>
               {t("dashboard.clear.filter")}
             </Button>
@@ -869,7 +885,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
           </span>
           <span>SC Point</span>
           <span>
-            <div>
+            <div className="header__process__scsymbol">
               {typeof record.scSymbol === "string"
                 ? record.scSymbol
                 : record.scSymbol.map(({ character, shape, remark }, idx) =>
@@ -970,7 +986,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
           })}
         </div>
       </div>
-      <div className="table__expand-row__history">
+      {/* <div className="table__expand-row__history">
         <p>History</p>
         <Timeline mode="left">
           <Timeline.Item color="green" label="2022-06-22 16:00:00">
@@ -980,7 +996,11 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             </div>
             <p>Lorem ipsum dolor sit amet.</p>
           </Timeline.Item>
-          <Timeline.Item color="red" dot={<CloseCircleOutlined style={{fontSize: "16px"}}/>} label="2022-06-22 16:00:00">
+          <Timeline.Item
+            color="red"
+            dot={<CloseCircleOutlined style={{ fontSize: "16px" }} />}
+            label="2022-06-22 16:00:00"
+          >
             <div>
               <p>Mr. TL</p>
               <p title="Rejected"> Rejected</p>
@@ -1001,7 +1021,11 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             </div>
             <p>Lorem ipsum dolor sit amet.</p>
           </Timeline.Item>
-          <Timeline.Item color="blue" dot={<ClockCircleOutlined style={{fontSize: "16px"}}/>} label="2022-06-22 16:00:00">
+          <Timeline.Item
+            color="blue"
+            dot={<ClockCircleOutlined style={{ fontSize: "16px" }} />}
+            label="2022-06-22 16:00:00"
+          >
             <div>
               <p>Mr. MGR</p>
               <p title="Waiting">Waiting approve</p>
@@ -1009,8 +1033,8 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             <p>Lorem ipsum dolor sit amet.</p>
           </Timeline.Item>
         </Timeline>
-      </div>
-      <div className="table__expand-row__action">
+      </div> */}
+      {/* <div className="table__expand-row__action">
         <Popconfirm
           title={t("dashboard.action.cancel.confirm.title")}
           okText={t("dashboard.action.cancel.confirm.ok")}
@@ -1038,7 +1062,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             {t("dashboard.action.approve.text")}
           </Button>
         </Popconfirm>
-      </div>
+      </div> */}
     </div>
   );
 };

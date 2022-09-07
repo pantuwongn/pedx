@@ -24,7 +24,7 @@ export default async function submit(
     attachment,
     note,
     user: { user_uuid, access_token },
-  }: ReportDataType & {user:User} = await req.body;
+  }: ReportDataType & { user: User } = await req.body;
 
   try {
     const body = {
@@ -52,8 +52,8 @@ export default async function submit(
         headers: { Authorization: `Bearer ${access_token}` },
       }
     );
-    console.log(data.request_id)
-    res.json(data)
+    console.log(data.request_id);
+    res.json(data);
   } catch (error) {
     errorResponse(res, error);
   }

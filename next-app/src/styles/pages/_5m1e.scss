@@ -53,7 +53,8 @@
       width: 100%;
       *:not(.ant-tag):not(.ant-table-column-sorter-inner
           *):not(.ant-table-filter-trigger.active, .ant-table-filter-trigger.active
-          *):not(.table-column__status):not(.ant-steps-item-subtitle):not(.ant-timeline-item-head):not(.anticon *) {
+          *):not(.table-column__status):not(.ant-steps-item-subtitle):not(.ant-timeline-item-head):not(.anticon
+          *) {
         color: var(--font-color);
       }
       th,
@@ -131,7 +132,73 @@
                   }
                 }
               }
+              .header__process {
+                &__scsymbol {
+                  svg {
+                    height: 25px;
+                    width: fit-content;
+                    margin-right: 0.5rem;
+                    // &[class^="DENSO"] {
+                    //   stroke: rgb(0, 0, 0) !important;
+                    //   fill: rgb(220, 0, 50);
+                    //   text {
+                    //     stroke: rgb(0, 0, 0);
+                    //     fill: rgb(0, 0, 0);
+                    //   }
+                    // }
+                    // &[class^="TOYOTA"] {
+                    //   stroke: rgb(255, 255, 255) !important;
+                    //   fill: rgb(235, 10, 30);
+                    //   text {
+                    //     stroke: rgb(255, 255, 255);
+                    //     fill: rgb(255, 255, 255);
+                    //   }
+                    // }
+                    // &[class^="HONDA"] {
+                    //   stroke: silver !important;
+                    //   fill: rgb(204, 0, 0);
+                    //   text {
+                    //     stroke: silver;
+                    //     fill: rgb(204, 0, 0);
+                    //   }
+                    // }
+                    // &[class^="MAZDA"] {
+                    //   stroke: rgb(230, 230, 230) !important;
+                    //   fill: rgb(0, 128, 197);
+                    //   text {
+                    //     stroke: rgb(230, 230, 230);
+                    //     fill: rgb(0, 128, 197);
+                    //   }
+                    // }
+                    // &[class^="FORD"] {
+                    //   stroke: rgb(255, 255, 255) !important;
+                    //   fill: rgb(0, 52, 120);
+                    //   text {
+                    //     stroke: rgb(255, 255, 255);
+                    //     fill: rgb(0, 52, 120);
+                    //   }
+                    // }
+                    // &[class^="ISUZU"] {
+                    //   stroke: rgb(255, 255, 255) !important;
+                    //   fill: rgb(255, 255, 255);
+                    //   text {
+                    //     stroke: rgb(218, 37, 28);
+                    //     fill: rgb(218, 37, 28);
+                    //   }
+                    // }
+                    // &[class^="MITSUBISHI"] {
+                    //   stroke: rgb(29, 29, 27) !important;
+                    //   fill: rgb(226, 35, 26);
+                    //   text {
+                    //     stroke: rgb(29, 29, 27);
+                    //     fill: rgb(29, 29, 27);
+                    //   }
+                    // }
+                  }
+                }
+              }
             }
+
             &__detail {
               display: grid;
               grid-template-columns: 1fr 6fr;

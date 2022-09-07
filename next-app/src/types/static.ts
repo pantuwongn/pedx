@@ -133,6 +133,7 @@ export type MachineType = {
 };
 
 export type MachineDataType = {
+  machine_no: string;
   machine_name: string;
   machine_type: string;
   machine_maker: string;

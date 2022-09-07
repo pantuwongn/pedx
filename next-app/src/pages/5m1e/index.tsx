@@ -21,7 +21,7 @@ const _5M1E = () => {
       <div className="link-content">
         <h2>5M1E Report system</h2>
         <div className="link-group">
-          <Link href="/5m1e/dashboard?t=problem">
+          <Link href="/5m1e/dashboard">
             <p>
               <b>D</b>ashboard
             </p>

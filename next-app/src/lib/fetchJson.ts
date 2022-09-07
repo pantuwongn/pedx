@@ -4,10 +4,11 @@ export async function fetchJson<JSON = unknown>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<JSON> {
+  // console.log("in fetchJSON") //OK
   const response = await fetch(input, init);
-
+  // console.log("response = ", response) //Error status 500
   const data = await response.json();
-
+  // console.log("data = ", data)
   if (response.ok) {
     return data;
   }

@@ -32,12 +32,13 @@ def post_submit_request_stmt(request_id:UUID,submit_data: RequestCreateSubmit) -
             )
         )
         
-        INSERT INTO "request_no_{submit_data.process_name}"(request_id) VALUES (
+        INSERT INTO "request_no_{submit_data.request_process_name}"(request_id) VALUES (
             '{request_id}'
         ) RETURNING request_no
         """
-
+# TODO check statement of get_all_requests_stmt
 def get_all_requests_stmt(process_id: list[int],process_name:str) -> str:
+
     return f"""
         SELECT *,
             f.user_uuid as file_user_uuid,
@@ -48,22 +49,24 @@ def get_all_requests_stmt(process_id: list[int],process_name:str) -> str:
                     a.updated_at as action_updated_at
                 FROM (
                     SELECT *,
-                    r.created_at as req_created_at,
-                    r.updated_at as req_updated_at,
+                    to_char(r.created_at, 'DD-Mon-YYYY') as req_created_at,
+                    to_char(r.updated_at, 'DD-Mon-YYYY') as req_updated_at,
                     r.user_uuid as req_user_uuid,
-                    d.created_at as data_created_at,
-                    d.updated_at as data_updated_at
+                    to_char(d.created_at, 'DD-Mon-YYYY') as data_created_at,
+                    to_char(d.updated_at, 'DD-Mon-YYYY') as data_updated_at
                     FROM requests r
                     JOIN request_datas d USING (request_id)
-                    WHERE request_process_id IN {tuple(process_id)}
+                    WHERE request_process_id IN (1,2)
                 ) t 
                 LEFT JOIN request_actions a USING (request_id)
             ) s
             LEFT JOIN request_files f USING (request_id)
             LEFT JOIN request_concerned c USING (request_id)
-            LEFT JOIN "request_no_{process_name}" n USING (request_id)
-            LEFT JOIN groups g USING (group_id)
+            LEFT JOIN "request_no_5M1E" n USING (request_id)
+			LEFT JOIN actions_groups g USING (action_id)
+--             LEFT JOIN groups g USING (group_id)
         """
+        
 
 def get_request_stmt(id:str) -> str:
     return f"""

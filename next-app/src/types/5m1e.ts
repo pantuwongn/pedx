@@ -1,4 +1,17 @@
-import { CustomerJoinPlantDataType, GroupMemberDataType, LineDataType, MachineDataType, ModelDataType, ProcessJoinTypeDataType, ProductDataType, SCSymbolDataType, StateDataType, StateTypeDataType, TransitionJoinTransitionActionType, UserJoinRolePositionDataType } from "./static";
+import {
+  CustomerJoinPlantDataType,
+  GroupMemberDataType,
+  LineDataType,
+  MachineDataType,
+  ModelDataType,
+  ProcessJoinTypeDataType,
+  ProductDataType,
+  SCSymbolDataType,
+  StateDataType,
+  StateTypeDataType,
+  TransitionJoinTransitionActionType,
+  UserJoinRolePositionDataType,
+} from "./static";
 
 // report
 export type ReportDataType = {
@@ -10,9 +23,9 @@ export type ReportDataType = {
   detail: string[];
   product_id: number;
   line_id: number;
-  process_id: number;
-  machine_no: number;
-  part_no: number;
+  process_id: string;
+  machine_no: string;
+  part_no: string;
   attachment: FileType[];
   note: string;
 };
@@ -79,51 +92,50 @@ export type RequestConcernedDataType = {
   group_id: number;
 };
 
-
 export type TableDataType = {
   key: number;
-  id: string
+  id: string;
   type: string;
-  request_id: string
-  request_no: string
-  is_locked: boolean
-  createdAt: string
-  updatedAt: string
-  productName: ProductDataType
-  partNo:string
-  partName:string
-  modelId: number | undefined
-  modelData: ModelDataType | undefined
-  process: string | ProcessJoinTypeDataType
-  scSymbol:string|SCSymbolDataType[]
-  mcNo: string
-  mcData: MachineDataType
-  deptName: string
-  sectionCode: number
-  line: LineDataType
-  requestDataId: number
-  requestDataCreated: string
-  requestDataUpdated: string
-  category: string
-  listItem: string
-  itemDetail: string[]
-  requestFile: RequestFileDataType[]
-  requestNote: string
-  requesterName: string
-  tl: UserJoinRolePositionDataType[]
-  mgr: UserJoinRolePositionDataType[]
-  fm: UserJoinRolePositionDataType[]
-  supporter: SupporterDataType[]
-  requestStatus:StateDataType & StateTypeDataType
-  requestConcern: RequestConcernedDataType[]
-  customers: CustomerJoinPlantDataType[] | undefined
-  actions:RequestActionDataType[]
-  actionButton:TransitionJoinTransitionActionType
-}
+  request_id: string;
+  request_no: string;
+  is_locked: boolean;
+  createdAt: string;
+  updatedAt: string;
+  productName: ProductDataType;
+  partNo: string;
+  partName: string;
+  modelId: number | undefined;
+  modelData: ModelDataType | undefined;
+  process: string | ProcessJoinTypeDataType;
+  scSymbol: string | SCSymbolDataType[];
+  mcNo: string;
+  mcData: MachineDataType;
+  deptName: string;
+  sectionCode: number;
+  line: LineDataType;
+  requestDataId: number;
+  requestDataCreated: string;
+  requestDataUpdated: string;
+  category: string;
+  listItem: string;
+  itemDetail: string[];
+  requestFile: RequestFileDataType[];
+  requestNote: string;
+  requesterName: string;
+  tl: UserJoinRolePositionDataType[];
+  mgr: UserJoinRolePositionDataType[];
+  fm: UserJoinRolePositionDataType[];
+  supporter: SupporterDataType[];
+  requestStatus: StateDataType & StateTypeDataType;
+  requestConcern: RequestConcernedDataType[];
+  customers: CustomerJoinPlantDataType[] | undefined;
+  actions: RequestActionDataType[];
+  actionButton: TransitionJoinTransitionActionType;
+};
 
 export type SupporterDataType = {
-  concerned_user_uuid: string
-  group_id: number
-  group_name: string
-  group_members: GroupMemberDataType[]
-}
+  concerned_user_uuid: string;
+  group_id: number;
+  group_name: string;
+  group_members: GroupMemberDataType[];
+};

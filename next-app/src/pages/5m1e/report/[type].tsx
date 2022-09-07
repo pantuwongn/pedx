@@ -242,7 +242,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     setPartNo(undefined);
     form.resetFields(["part"]);
   }, [machineNo]);
-  //CHECK POINT!
+  //TODO submit report
   useEffect(() => {
     // set inputChanged status
     setInputChanged(true);
@@ -283,9 +283,10 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
       },
       body: JSON.stringify(reportData),
     });
-
+    // console.log("report data = ", JSON.stringify(reportData));
+    console.log("sent data = ", data);
     if (data) {
-      message.success(`Submit completed, Request id: ${data.request_id}`, 5);
+      message.success(`Submit completed, Request id: ${data.request_no}`, 5);
       onReset();
     } else {
       message.error(`Submit response return was error (response is ${data})`);
@@ -318,7 +319,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
           }` //seem to not right
         : detail
     );
-    console.log(values.detail)
+
     const request_process_id = path_t === "problem" ? 1 : 2;
     return {
       request_process_id: request_process_id,
@@ -600,9 +601,9 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
               >
                 {machineList &&
                   Object.entries(machineList).map(
-                    ([no, { machine_name }], idx) => (
+                    ([no, { machine_no }], idx) => (
                       <Option value={no} key={idx}>
-                        {machine_name}
+                        {machine_no}
                       </Option>
                     )
                   )}

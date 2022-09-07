@@ -20,7 +20,6 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         user_pass: user_pass,
       }
     );
-    // console.log(data)
     const user = {
       isLoggedIn: true,
       user_uuid: data.user_uuid,

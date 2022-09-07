@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         value={{
           fetcher: fetchJson,
           onError: (err) => {
-            console.log(err);
+            console.log("error = ", err);
           },
         }}
       >

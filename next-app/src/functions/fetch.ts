@@ -6,6 +6,7 @@ export async function fetcher(url: string, options: Object = {}): Promise<any> {
   try {
     // console.log('fetcher',url,options)
     const data = await fetchJson(url, options);
+    // console.log("data in fetcher",data);
     return data;
 
     // let config: AxiosRequestConfig = {

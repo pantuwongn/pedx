@@ -17,7 +17,7 @@ This project was use
 
 First, define environment variable value for service
 
-#### Next.js environment (.env.production/development)
+#### Next.js environment (.env.production & .env.development)
 ```bash
 # Secret key for encrypt and decrypt cookie for 'swr'
 SECRET_COOKIE_PASSWORD = ...
