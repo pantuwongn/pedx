@@ -11,7 +11,7 @@ async function getCurrentUser(req: NextApiRequest, res: NextApiResponse) {
     try {
       const { access_token } = req.session.user;
       const { data } = await axios.get(
-        `${process.env.BASE_URL_BACKEND}/users/me`,
+        `${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/users/me`,
         {
           ...req.headers,
           headers: { Authorization: `Bearer ${access_token}` },

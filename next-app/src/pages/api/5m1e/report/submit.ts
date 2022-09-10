@@ -16,6 +16,7 @@ export default async function submit(
     category,
     list,
     detail,
+    kpi,
     product_id,
     line_id,
     process_id,
@@ -33,6 +34,7 @@ export default async function submit(
         category: category,
         list: list,
         detail: detail,
+        kpi: kpi,
         product_id: product_id,
         process_id: process_id,
         machine_no: machine_no,
@@ -46,7 +48,7 @@ export default async function submit(
     };
 
     const { data } = await axios.post(
-      `${process.env.BASE_URL_BACKEND}/request/submit`,
+      `${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/request/submit`,
       body,
       {
         headers: { Authorization: `Bearer ${access_token}` },

@@ -14,7 +14,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const { data } = await axios.post(
-      `${process.env.BASE_URL_BACKEND}/users/login`,
+      `${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/users/login`,
       {
         user_id: user_id,
         user_pass: user_pass,

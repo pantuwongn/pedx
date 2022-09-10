@@ -2,7 +2,7 @@ import { IronSessionOptions } from "iron-session";
 import type { User } from "@/types/static";
 
 export const sessionOptions: IronSessionOptions = {
-  password: process.env.SECRET_COOKIE_PASSWORD as string,
+  password: process.env.NEXT_PUBLIC_SECRET_COOKIE_PASSWORD as string,
   cookieName: "pedx/app",
   cookieOptions: {
     httpOnly:true,

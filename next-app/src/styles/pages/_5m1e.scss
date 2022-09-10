@@ -497,6 +497,19 @@
         grid-template-columns: repeat(2, 50%);
         gap: 2rem;
         .addition {
+          &__kpi {
+            &__wrapper {
+              .ant-checkbox-group {
+                background-color: red;
+                .ant-checkbox-wrapper {
+                  background-color: red;
+                  .ant-checkbox {
+                    background-color: red;
+                  }
+                }
+              }
+            }
+          }
           &__product,
           &__line,
           &__process,

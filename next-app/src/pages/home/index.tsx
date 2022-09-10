@@ -17,14 +17,14 @@ const LinkGroup = () => {
           <b>5M1E</b> Report
         </p>
       </Link>
-      <Link href={"/dea"}>
+      {/* <Link href={"/dea"}>
         <p>
           <b>D</b>ocument <b>E</b>asy <b>A</b>ccess
         </p>
-      </Link>
+      </Link> */}
       <Link href={"/energy"}>
         <p>
-          <b>E</b>nergy <b>V</b>sualization
+          <b>E</b>nergy <b>V</b>isualization
         </p>
       </Link>
     </div>
@@ -40,7 +40,7 @@ const Home: NextPage = () => {
       <main className="home-content">
         <div className="link-content">
           <h1>
-            {t("welcome")} <b>PE application</b>
+            {t("welcome")} <b>DX Engineer Application</b>
           </h1>
           <LinkGroup />
         </div>

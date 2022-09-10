@@ -8,7 +8,7 @@ export default async function getStaticDashboard(
 ) {
   try {
     await axios
-      .get(`${process.env.BASE_URL_BACKEND}/static/5m1e/dashboard`)
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/static/5m1e/dashboard`)
       .then((resp) => res.json(resp.data));
   } catch (error) {
     errorResponse(res, error);

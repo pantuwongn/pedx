@@ -307,6 +307,12 @@ export type CategoryType =
   | "Measurement"
   | "Environment";
 
+export type KPIType = 
+  | "Safety"
+  | "Quality"
+  | "Cost"
+  | "Delivery"
+
 export type ListItemDataType = {
   list_item_id: number;
   list_item_name: string;

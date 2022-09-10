@@ -54,7 +54,7 @@ const LogoLink = React.forwardRef(function forwardRef({ onClick, href }, ref) {
       <abbr title="Home">
         <div className="logo-link">
           <Image src="/pe-dx-logo.svg" width={40} height={40} />
-          <b>PE BPK APPS</b>
+          <b>DX ENGINEER APPS</b>
         </div>
       </abbr>
     </a>

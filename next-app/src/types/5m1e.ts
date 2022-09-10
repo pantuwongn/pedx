@@ -21,6 +21,7 @@ export type ReportDataType = {
   category: string;
   list: string;
   detail: string[];
+  kpi: string[];
   product_id: number;
   line_id: number;
   process_id: string;
@@ -61,6 +62,7 @@ export type RequestDataValueType = {
   category: string;
   list: string;
   detail: string[];
+  kpi: string;
   product_id: string;
   process_id: string;
   machine_no: string;
@@ -96,6 +98,7 @@ export type TableDataType = {
   key: number;
   id: string;
   type: string;
+  kpi: string;
   request_id: string;
   request_no: string;
   is_locked: boolean;

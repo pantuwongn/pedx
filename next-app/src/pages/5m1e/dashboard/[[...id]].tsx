@@ -108,6 +108,8 @@ const categories = [
   "Environment",
 ];
 
+const kpi = ["Safety", "Quality", "Cost", "Delivery"];
+
 const sups = ["PE", "QA", "SAFETY", "DESIGN", "FAC"];
 const supporterColor: { [key: string]: string } = {
   PE: "purple",
@@ -189,7 +191,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     []
   );
   const [tableData, setTableData] = useState<TableDataType[]>();
-  const [tableType, setTableType] = useState<string>("problem");
+  const [tableType, setTableType] = useState<string>("All");
   const [tablePages, setTablePages] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filteredInfo, setFilteredInfo] = useState<
@@ -199,14 +201,13 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
 
   async function socketInitialize() {
     // await fetch("/api/socket");
-    socket = io("http://127.0.0.1:8000/", {
+    socket = io(`${process.env.NEXT_PUBLIC_WEB_SOCKET_URL}`, {
       path: "/ws/socket.io/",
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 15000,
       reconnectionDelayMax: 300000,
     });
-
     socket.on("connect", () => {
       console.log("connected");
     });
@@ -280,6 +281,22 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         sorter: (a, b) => a.category.localeCompare(b.category),
         sortOrder:
           sortedInfo.columnKey === "category" ? sortedInfo.order : null,
+      },
+      {
+        key: "kpi",
+        title: "KPI",
+        dataIndex: "kpi",
+        fixed: "left",
+        width: 100,
+        filters: [
+          { text: "Safety", value: "Safety" },
+          { text: "Quality", value: "Quality" },
+          { text: "Cost", value: "Cost" },
+          { text: "Delivery", value: "Delivery" },
+        ],
+        onFilter: (value: any, record) =>
+          record.kpi.indexOf(value.toString()) >= 0,
+        filteredValue: filteredInfo.kpi || null,
       },
       {
         key: "product",
@@ -451,11 +468,14 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         ({ sc_symbol_id }) => sc_symbols[sc_symbol_id.toString()]
       );
     }
+
     const body = {
       t: "1,2",
       t_name: "5M1E",
       access_token: user?.access_token,
     };
+
+    //TODO Confirm RequestDashboardType
     const data: RequestDashboardType = await fetcher(
       "/api/5m1e/dashboard/getallrequests",
       {
@@ -466,7 +486,8 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         body: JSON.stringify(body),
       }
     );
-    // console.log("data = ", data);
+    console.log("data =", data);
+
     if (!data || Object.keys(data).length === 0) return;
     // TODO check data fetched from backend
     // rearrange for table data format
@@ -484,6 +505,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
               category,
               list,
               detail,
+              kpi,
               product_id,
               process_id,
               machine_no,
@@ -570,6 +592,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
             (item) => item.list_item_id.toString() === list
           )[0].list_item_name,
           itemDetail: detail,
+          kpi: kpi.toString(),
           requestFile: files,
           requestNote: note,
           requesterName: users_join_roles_positions[req_user_uuid].firstname,
@@ -611,10 +634,6 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     sorter,
     extra
   ) => {
-    console.log("Various parameters", pagination, filters, sorter, extra);
-    console.log("sorterBefore = ", sorter);
-    console.log("sortedInfoBefore = ", sortedInfo);
-
     setFilteredInfo(filters);
     setSortedInfo(sorter as SorterResult<TableDataType>);
 
@@ -640,13 +659,13 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
       ...filteredInfo,
       type: values.type ? [values.type] : null,
       category: values.category ? [values.category] : null,
+      topic: values.topic ? [values.topic] : null,
+      kpi: values.kpi ? [values.kpi] : null,
       part: values.part ? [values.part] : null,
       line: values.line ? [values.line] : null,
-      problem: values.problem ? [values.problem] : null,
       informer: values.informer ? [values.informer] : null,
       manager: values.manager ? [values.manager] : null,
     });
-    console.log("this is filteredInfo in onSearchSubmit: ", filteredInfo);
   }
 
   const clearFilters = () => {
@@ -710,9 +729,8 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
   }, [pathQuery]);
 
   useEffect(() => {
-    console.log("sortedInfoAfter = ", sortedInfo);
-    CreateColumns()
-  }, [filteredInfo,sortedInfo]);
+    CreateColumns();
+  }, [filteredInfo, sortedInfo]);
 
   if (!user || user.isLoggedIn === false) {
     return (
@@ -759,6 +777,18 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
                     ))}
                   </Select>
                 </Form.Item>
+                <Form.Item label="KPI" name="kpi">
+                  <Input
+                    placeholder="search by KPI"
+                    style={{ width: "100%" }}
+                  ></Input>
+                </Form.Item>
+                <Form.Item label="Topic" name="topic">
+                  <Input
+                    placeholder="search by topic"
+                    style={{ width: "100%" }}
+                  ></Input>
+                </Form.Item>
                 <Form.Item label="Part" name="part">
                   <Input
                     placeholder="search by part"
@@ -768,12 +798,6 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
                 <Form.Item label="Line" name="line">
                   <Input
                     placeholder="search by line"
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-                <Form.Item label="Problem" name="problem">
-                  <Input
-                    placeholder="search by problem"
                     style={{ width: "100%" }}
                   />
                 </Form.Item>
@@ -1081,7 +1105,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   }
 
   const data = await fetch(
-    `${process.env.BASE_URL_FRONTEND}/api/5m1e/static/dashboard`,
+    `${process.env.NEXT_PUBLIC_BASE_URL_FRONTEND}/api/5m1e/static/dashboard`,
     { method: "GET" }
   );
   const resp: DashboardPropsTypes = await data.json();

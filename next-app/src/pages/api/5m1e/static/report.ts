@@ -8,7 +8,7 @@ export default async function getStaticReport(
 ) {
   try {
     await axios
-      .get(`${process.env.BASE_URL_BACKEND}/static/5m1e/report`)
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/static/5m1e/report`)
       .then((resp) => res.json(resp.data));
   } catch (error) {
     errorResponse(res, error);

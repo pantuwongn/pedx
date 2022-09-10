@@ -10,6 +10,9 @@
     "detail": {
       "label": "Detail"
     },
+    "kpi": {
+      "label": "KPI"
+    },
     "product": {
       "label": "Product"
     },

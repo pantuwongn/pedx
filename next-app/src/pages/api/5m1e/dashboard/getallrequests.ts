@@ -10,7 +10,7 @@ export default async function getRequestDataDashboard(
   try {
     await axios
       .get(
-        `${process.env.BASE_URL_BACKEND}/request/get/allrequests?t=${t}&t_name=${t_name}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL_BACKEND}/request/get/allrequests?t=${t}&t_name=${t_name}`,
         {
           headers: { Authorization: `Bearer ${access_token}` },
         }

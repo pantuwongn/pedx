@@ -11,7 +11,7 @@ const _5M1E = () => {
   if (!user || user.isLoggedIn === false) {
     return (
       <div className="_5m1e center-main">
-        <p>Not logged in yet, please log in before use this page.</p>
+        <p>Not logged in yet? Please log in before using this page.</p>
       </div>
     );
   }
@@ -19,11 +19,11 @@ const _5M1E = () => {
   return (
     <div className="_5m1e center-main">
       <div className="link-content">
-        <h2>5M1E Report system</h2>
+        <h2>5M1E Report System</h2>
         <div className="link-group">
           <Link href="/5m1e/dashboard">
             <p>
-              <b>D</b>ashboard
+              <b>O</b>verview
             </p>
           </Link>
           <Link href="/5m1e/report/problem">

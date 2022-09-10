@@ -24,7 +24,7 @@ import { useRouter } from "next/router";
 import useUser from "@/lib/useUser";
 import type { ReportDataType } from "@/types/5m1e";
 import { fetcher } from "@/functions/fetch";
-import type {
+import {
   ProductType,
   LineType,
   ProcessType,
@@ -38,6 +38,7 @@ import type {
   ProcessMachineType,
   PartMachineType,
   RequestProcessType,
+  KPIType,
 } from "@/types/static";
 
 const { TextArea } = Input;
@@ -51,6 +52,8 @@ const categories = [
   "Measurement",
   "Environment",
 ];
+
+const kpiList = ["Safety", "Quality", "Cost", "Delivery"];
 
 type ReportPropsTypes = {
   request_processes: RequestProcessType;
@@ -108,6 +111,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
   const [detailSelectedValues, setDetailSelectedValues] = useState<string[]>(
     []
   );
+  const [kpiValue, setKPIValue] = useState<string[]>([]);
   const [productId, setProductId] = useState<string>();
   const [lineId, setLineId] = useState<string>();
   const [processId, setProcessId] = useState<string>();
@@ -251,6 +255,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
       !categoryValue ||
       !listItemSelectedValue ||
       !(detailSelectedValues.length > 0) ||
+      !kpiValue ||
       !productId ||
       !lineId
     ) {
@@ -263,6 +268,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     categoryValue,
     listItemSelectedValue,
     detailSelectedValues,
+    kpiValue,
     productId,
     lineId,
   ]);
@@ -276,6 +282,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     console.log(values);
     setSubmitting(true);
     const reportData = { ...getReportData(values), user: user };
+
     const data = await fetcher("/api/5m1e/report/submit", {
       method: "POST",
       headers: {
@@ -283,7 +290,6 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
       },
       body: JSON.stringify(reportData),
     });
-    // console.log("report data = ", JSON.stringify(reportData));
     console.log("sent data = ", data);
     if (data) {
       message.success(`Submit completed, Request id: ${data.request_no}`, 5);
@@ -307,6 +313,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
     setCategoryValue(undefined);
     setItemList([]);
     setListItemSelectedValue(undefined);
+    setKPIValue([]);
     setDetailSelectedValues([]);
     setProductId(undefined);
   }
@@ -329,6 +336,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
       category: values.category,
       list: values.list,
       detail: detailValue,
+      kpi: values.kpi,
       product_id: values.product,
       line_id: parseInt(values.line),
       process_id: values.process || "-",
@@ -418,7 +426,7 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
   if (!user || user.isLoggedIn === false) {
     return (
       <div className="_5m1e center-main">
-        <p>Not logged in yet, please log in before use this page.</p>
+        <p>Not logged in yet? Please log in before using this page.</p>
       </div>
     );
   }
@@ -524,6 +532,26 @@ const Report = (props: typeof getStaticProps & ReportPropsTypes) => {
         )}
         {detailSelectedValues.length > 0 && (
           <div className="_5m1e__report__form__addition">
+            <Form.Item
+              name="kpi"
+              className="_5m1e__report__form__kpi"
+              label={t("report.kpi.label")}
+              required
+            >
+              <Checkbox.Group>
+                {kpiList &&
+                  kpiList.map((item, idx) => (
+                    <Checkbox
+                      key={idx}
+                      value={item}
+                      defaultChecked={false}
+                      onChange={(e) => onDetailChange(e)}
+                    >
+                      {item}
+                    </Checkbox>
+                  ))}
+              </Checkbox.Group>
+            </Form.Item>
             <Form.Item
               name="product"
               className="addition__product"
@@ -708,7 +736,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   }
 
   const data = await fetch(
-    `${process.env.BASE_URL_FRONTEND}/api/5m1e/static/report`,
+    `${process.env.NEXT_PUBLIC_BASE_URL_FRONTEND}/api/5m1e/static/report`,
     { method: "GET" }
   );
   const resp: ReportPropsTypes = await data.json();
