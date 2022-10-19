@@ -534,7 +534,8 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
         let tl: UserJoinRolePositionDataType[] = [];
         let mgr: UserJoinRolePositionDataType[] = [];
         let fm: UserJoinRolePositionDataType[] = [];
-        lines_users[line_id.toString()].data.forEach(({ user_uuid }) => {
+        console.log(lines_users[line_id.toString()]);
+        lines_users[line_id.toString()]?.data.forEach(({ user_uuid }) => {
           if (users_join_roles_positions[user_uuid].position_name === "TL") {
             tl.push(users_join_roles_positions[user_uuid]);
           } else if (
@@ -592,7 +593,7 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
             (item) => item.list_item_id.toString() === list
           )[0].list_item_name,
           itemDetail: detail,
-          kpi: kpi.toString(),
+          kpi: kpi.toString().replaceAll(",", ", "),
           requestFile: files,
           requestNote: note,
           requesterName: users_join_roles_positions[req_user_uuid].firstname,
@@ -626,6 +627,48 @@ const Dashboard = (props: typeof getStaticProps & DashboardPropsTypes) => {
     );
     setTableData(rearrangedData);
     setTablePages(rearrangedData.length);
+
+    const somebody = {
+      product_id: "2",
+      start_date: "2022-09-01",
+      end_date: "2022-09-30",
+      access_token: user?.access_token,
+    };
+    const summaryData: RequestDashboardType = await fetcher(
+      "/api/5m1e/dashboard/getsummaryrequests",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(somebody),
+      }
+    );
+    console.log("summaryData =", summaryData);
+
+    const changeKpiData: RequestDashboardType = await fetcher(
+      "/api/5m1e/dashboard/getchangekpi",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(somebody),
+      }
+    );
+    console.log("changeKpiData = ", changeKpiData);
+
+    const changeCategoryData: RequestDashboardType = await fetcher(
+      "/api/5m1e/dashboard/getchangecategory",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(somebody),
+      }
+    );
+    console.log("changeCategoryData = ", changeCategoryData);
   };
 
   const onTableChange: TableProps<TableDataType>["onChange"] = (
@@ -1010,7 +1053,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
           })}
         </div>
       </div>
-      {/* <div className="table__expand-row__history">
+      <div className="table__expand-row__history">
         <p>History</p>
         <Timeline mode="left">
           <Timeline.Item color="green" label="2022-06-22 16:00:00">
@@ -1057,8 +1100,8 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             <p>Lorem ipsum dolor sit amet.</p>
           </Timeline.Item>
         </Timeline>
-      </div> */}
-      {/* <div className="table__expand-row__action">
+      </div>
+      <div className="table__expand-row__action">
         <Popconfirm
           title={t("dashboard.action.cancel.confirm.title")}
           okText={t("dashboard.action.cancel.confirm.ok")}
@@ -1086,7 +1129,7 @@ const TableExpand: FC<{ record: TableDataType }> = ({ record }) => {
             {t("dashboard.action.approve.text")}
           </Button>
         </Popconfirm>
-      </div> */}
+      </div>
     </div>
   );
 };

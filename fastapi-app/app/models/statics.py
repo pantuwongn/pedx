@@ -1,3 +1,4 @@
+from email.policy import default
 from sqlalchemy import (
     Column,
     String,
@@ -10,6 +11,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import ARRAY
+
 
 from app.database import Base
 
@@ -68,11 +71,17 @@ class Lines(Base):
     line_name = Column(String, nullable=False)
     work_center_code = Column(String, nullable=False)
     section_id = Column(Integer, ForeignKey("sections.section_id"))
+    breaker_list = Column(ARRAY(Integer))
+    valve_list = Column(ARRAY(Integer))
 
     user = relationship("Users", secondary="lines_users", back_populates="line")
     section = relationship("Sections", back_populates="line")
     part = relationship("Parts", secondary="lines_parts", back_populates="line")
     request = relationship("Requests", back_populates="line")
+    product = relationship(
+        "Products", secondary="products_lines", back_populates="line"
+    )
+    database = relationship("LinesDatabases", back_populates="line")
 
 
 class Machines(Base):
@@ -88,6 +97,12 @@ class Machines(Base):
         "Processes", secondary="processes_machines", back_populates="machine"
     )
     part = relationship("Parts", secondary="parts_machines", back_populates="machine")
+    breaker = relationship(
+        "BreakerUnits", secondary="machines_breakers", back_populates="machine"
+    )
+    valve = relationship(
+        "ValveUnits", secondary="machines_valves", back_populates="machine"
+    )
 
 
 class ProcessTypes(Base):
@@ -146,6 +161,7 @@ class Products(Base):
     short_name = Column(String, nullable=False)
 
     part = relationship("Parts", back_populates="product")
+    line = relationship("Lines", secondary="products_lines", back_populates="product")
 
 
 class Models(Base):
@@ -391,6 +407,46 @@ class ItemDetails(Base):
     list_item = relationship("ListItems", back_populates="item_detail")
 
 
+class LinesDatabases(Base):
+    __tablename__ = "lines_databases"
+
+    id = Column(Integer, Sequence("lines_databases_id_seq"), primary_key=True)
+    line_id = Column(Integer, ForeignKey("lines.line_id"))
+    type = Column(String, nullable=False)
+    db_server = Column(String, nullable=False)
+    db_port = Column(String, nullable=False)
+    db_user = Column(String, nullable=False)
+    db_pass = Column(String, nullable=False)
+    db_name = Column(String, default="")
+    db_provider = Column(String, default="postgresql")
+    description = Column(String, default="")
+
+    line = relationship("Lines", back_populates="database")
+
+
+class BreakerUnits(Base):
+    __tablename__ = "breaker_units"
+    id = Column(Integer, Sequence("breaker_units_id_seq"), primary_key=True)
+    breaker_name = Column(String, nullable=False)
+    description = Column(String, default="")
+
+    machine = relationship(
+        "Machines", secondary="machines_breakers", back_populates="breaker"
+    )
+
+
+class ValveUnits(Base):
+    __tablename__ = "valve_units"
+
+    id = Column(Integer, Sequence("valve_units_id_seq"), primary_key=True)
+    valve_name = Column(String, nullable=False)
+    description = Column(String, default="")
+
+    valve = relationship(
+        "Machines", secondary="machines_valves", back_populates="valve"
+    )
+
+
 # many-to-many table
 class LinesParts(Base):
     __tablename__ = "lines_parts"
@@ -499,3 +555,27 @@ class ActivitiesGroups(Base):
     id = Column(Integer, Sequence("activites_groups_id_seq"), primary_key=True)
     activity_id = Column(Integer, ForeignKey("activities.activity_id"), nullable=False)
     group_id = Column(Integer, ForeignKey("groups.group_id"), nullable=False)
+
+
+class ProductsLines(Base):
+    __tablename__ = "products_lines"
+
+    id = Column(Integer, Sequence("products_lines_id_seq"), primary_key=True)
+    product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
+    line_id = Column(Integer, ForeignKey("lines.line_id"), nullable=False)
+
+
+class MachinesBreakers(Base):
+    __tablename__ = "machines_breakers"
+
+    id = Column(Integer, Sequence("machines_breakers_id_seq"), primary_key=True)
+    machine_no = Column(String, ForeignKey("machines.machine_no"), nullable=False)
+    breaker_id = Column(Integer, ForeignKey("breaker_units.id"), nullable=False)
+
+
+class MachinesValves(Base):
+    __tablename__ = "machines_valves"
+
+    id = Column(Integer, Sequence("machines_valves_id_seq"), primary_key=True)
+    machine_no = Column(String, ForeignKey("machines.machine_no"), nullable=False)
+    valve_id = Column(Integer, ForeignKey("valve_units.id"), nullable=False)

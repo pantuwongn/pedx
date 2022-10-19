@@ -64,4 +64,46 @@ def request_routers(db: AsyncGenerator) -> APIRouter:
         rs = await crud.get_count_all_requests(db)
         return rs[0]["c"]
 
+    @router.get(
+        "/get/summaryrequests",
+        dependencies=[Depends(BearerDependency(auto_error=False))],
+    )
+    async def get_summary_requests(
+        product_id: int, start_date: str, end_date: str, db: AsyncSession = Depends(db)
+    ):
+        rs = await crud.get_summary_requests(product_id, start_date, end_date, db)
+        return rs
+
+    @router.get(
+        "/get/changekpi",
+        dependencies=[Depends(BearerDependency(auto_error=False))],
+    )
+    async def get_change_kpi(
+        product_id: int, start_date: str, end_date: str, db: AsyncSession = Depends(db)
+    ):
+        rs = await crud.get_change_kpi(product_id, start_date, end_date, db)
+        return rs
+
+    @router.get(
+        "/get/changecategory",
+        dependencies=[Depends(BearerDependency(auto_error=False))],
+    )
+    async def get_change_category(
+        product_id: int, start_date: str, end_date: str, db: AsyncSession = Depends(db)
+    ):
+        rs = await crud.get_change_category(product_id, start_date, end_date, db)
+        return rs
+
+    @router.get(
+        "/get/changerequestbydateproduct",
+        dependencies=[Depends(BearerDependency(auto_error=False))],
+    )
+    async def get_change_request_by_date_product(
+        product_id: int, start_date: str, end_date: str, db: AsyncSession = Depends(db)
+    ):
+        rs = await crud.get_change_request_by_date_product(
+            product_id, start_date, end_date, db
+        )
+        return rs
+
     return router

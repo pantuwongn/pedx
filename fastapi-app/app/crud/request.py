@@ -3,9 +3,13 @@ import uuid
 import json
 
 from app.schemas.request import RequestCreateSubmit
-from app.functions import toArrayWithKey, toDictByColumnId, toDictArrayByColumnId
+from app.functions import (
+    toArrayWithKey,
+    toDictByColumnId,
+    toDictArrayByColumnId,
+    toArray,
+)
 from app.crud.statements import request as st
-
 
 class RequestCRUD:
     def __init__(self):
@@ -18,12 +22,14 @@ class RequestCRUD:
         stmt = st.post_submit_request_stmt(request_id, submit_data)
         rs = toArrayWithKey(await db.execute(stmt))
         await db.commit()
-        return {"request_no": rs[0]['request_no']}
+        request_id = rs[0]['request_id']
+        request = await self.get_request(request_id, db)
+        print(request)
+        return {"request_no": rs[0]["request_no"]}
 
     async def get_all_requests_by_type(
         self, process_id: list[int], process_name: str, db: AsyncSession
     ) -> dict:
-
         stmt = st.get_all_requests_stmt(process_id, process_name)
         rs = toArrayWithKey(await db.execute(stmt))
         rs = rearrangeRequestActionData(rs, "request_no")
@@ -48,6 +54,37 @@ class RequestCRUD:
         rs = toArrayWithKey(await db.execute(stmt))
         return rs
 
+    async def get_summary_requests(
+        self, product_id: int, start_date: str, end_date: str, db: AsyncSession
+    ) -> dict:
+
+        stmt = st.get_summary_requests_stmt(product_id, start_date, end_date)
+        rs = toArrayWithKey(await db.execute(stmt))
+        return rs
+
+    async def get_change_kpi(
+        self, product_id: int, start_date: str, end_date: str, db: AsyncSession
+    ) -> dict:
+
+        stmt = st.get_change_kpi_stmt(product_id, start_date, end_date)
+        rs = toArrayWithKey(await db.execute(stmt))
+        return rs
+
+    async def get_change_category(
+        self, product_id: int, start_date: str, end_date: str, db: AsyncSession
+    ) -> dict:
+
+        stmt = st.get_change_category_stmt(product_id, start_date, end_date)
+        rs = toArrayWithKey(await db.execute(stmt))
+        return rs
+
+    async def get_change_request_by_date_product(
+        self, product_id: int, start_date: str, end_date: str, db: AsyncSession
+    ) -> dict:
+
+        stmt = st.get_change_request_by_date_product_stmt(product_id, start_date, end_date)
+        rs = toArrayWithKey(await db.execute(stmt))
+        return rs
 
 def rearrangeRequestActionData(input: list, id_column: str):
     actionColumns = [

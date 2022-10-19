@@ -8,7 +8,7 @@ class RequestBase(BaseModel):
 
 class RequestCreateSubmit(RequestBase):
     request_process_name: str
-    data_value: Dict[str,str|int|list]
+    data_value: Dict[str, str | int | list | tuple]
     user_uuid: str
     line_id: int
     request_process_id: int

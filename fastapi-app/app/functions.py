@@ -12,6 +12,7 @@ def toArray(input: Any) -> list:
 
 def toArrayWithKey(input: Any, except_column: list[str] = []) -> list:
     tz = pytz.timezone("Asia/Bangkok")
+    print("input = ", input)
     # query with raw statement
     rs = [
         {
